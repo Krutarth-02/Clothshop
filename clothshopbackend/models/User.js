@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const UserSchema = mongoose.Schema({
     email:{
-        type:SVGStringList,
+        type:String,
         require:true,
         unique:true,
     },
