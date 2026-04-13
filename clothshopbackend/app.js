@@ -5,8 +5,6 @@ const cors = require('cors');
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 require('dotenv').config();
-console.log("MONGO_URI:", process.env.MONGO_URI);
-
 // Connect to the database
 connectDB();
 
@@ -16,9 +14,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-const authRoute = require('./routes/auth.route');
-app.use('/api/auth', authRoute);
+const authRoute = require('./routes/auth.routes');
+const productRoute = require('./routes/product.routes');
+const userRoute = require('./routes/user.routes');
 
+app.use('/api/auth', authRoute);
+app.use('/api/products', productRoute);
+app.use('/api/user', userRoute);
 // Start the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
