@@ -8,6 +8,12 @@ const UserSchema = mongoose.Schema({
     country: { type: String },
     phone: { type: String },
     image: { type: String },
+    otp: { type: String },
+    otpExpiry: { type: Date },
+    isOtpVerified: {
+        type: Boolean,
+        default: false
+    },
 },
 )
 module.exports = mongoose.model("User", UserSchema);
