@@ -21,7 +21,37 @@ const getProductById = async (req, res,next) => {
         next(error);
     }
 }
+
+const searchProducts = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+
+    if (!keyword) {
+      return res.status(400).json({ message: "Search keyword required" });
+    }
+
+    // 🔍 Search logic
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { category: { $regex: keyword, $options: "i" } },
+        { brand: { $regex: keyword, $options: "i" } },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
     getProducts,
-    getProductById
+    getProductById,
+    searchProducts,
 }

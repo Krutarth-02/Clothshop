@@ -61,6 +61,11 @@ export const authApi = createApi({
         body: data,
       }),
     }),
+    searchProducts:builder.query({
+      query:(keyword)=>({
+        url:`/products/search?keyword=${keyword}`
+      })
+    })
   }),
 });
 
