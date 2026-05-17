@@ -22,7 +22,7 @@ const LoginUser = async (req, res, next) => {
             sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
-        res.status(200).json({ message: "Login successful", token });
+        res.status(200).json({ message: "Login successful",data: user, token });
     } catch (err) {
         next(err);
     }
