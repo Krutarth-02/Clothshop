@@ -1,9 +1,10 @@
-import { Box, Card, Divider } from "@mantine/core";
+import { Box, Card, Divider, Image } from "@mantine/core";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Tooltipwrapper from "../common/Tooltipwrapper";
-import { Search, User, ShoppingBag, Bell } from "lucide-react";
+import { Search, User, ShoppingBag, Bell, SunMedium } from "lucide-react";
 import NotificationDrawer from "./NotificationDrawer";
+import logo from "../../assets/icons/LOGO.png";
 const Navbar = () => {
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
@@ -33,21 +34,13 @@ const Navbar = () => {
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-around",
-            gap: "5px",
-            padding: "7px",
+            justifyContent: "space-between",
+            padding: "5px 35px",
           }}
         >
-          <h1
-            style={{
-              fontSize: "24px",
-              fontWeight: 700,
-              margin: 0,
-              textTransform: "uppercase",
-            }}
-          >
-            HiFashionHub
-          </h1>
+          <Box w={50}>
+            <Image src={logo} radius="md" h={50} fit="contain" />
+          </Box>
           <Box
             style={{
               display: "flex",
@@ -60,32 +53,20 @@ const Navbar = () => {
             <Link to="/" style={{ textDecoration: "none", color: "black" }}>
               Home
             </Link>
-            <Link to="/shop" style={{ textDecoration: "none", color: "black" }}>
-              Shop
-            </Link>
             <Link
-              to="/about"
+              to="/women"
               style={{ textDecoration: "none", color: "black" }}
             >
-              About
+              Women
             </Link>
-            <Link
-              to="/contact"
-              style={{ textDecoration: "none", color: "black" }}
-            >
-              Contact
+            <Link to="/men" style={{ textDecoration: "none", color: "black" }}>
+              Men
             </Link>
-            <Link
-              to="/review"
-              style={{ textDecoration: "none", color: "black" }}
-            >
-              Review
-            </Link>
-            <Link to="/blog" style={{ textDecoration: "none", color: "black" }}>
-              Blog
+            <Link to="/kids" style={{ textDecoration: "none", color: "black" }}>
+              Kids
             </Link>
           </Box>
-          <Box style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+          <Box style={{ display: "flex", alignItems: "center", gap: "30px" }}>
             <Tooltipwrapper label="Search">
               <Search
                 size={20}
@@ -93,12 +74,13 @@ const Navbar = () => {
                 style={{ cursor: "pointer" }}
               />
             </Tooltipwrapper>
-            <Tooltipwrapper label="Profile">
-              <User
+            <Tooltipwrapper label="light">
+              <SunMedium size={20} style={{cursor:'pointer'}}/>
+            </Tooltipwrapper>
+            <Tooltipwrapper label="Notifications">
+              <Bell
                 size={20}
-                onClick={() => {
-                  navigate("/profile");
-                }}
+                onClick={() => setNotificationsOpen(true)}
                 style={{ cursor: "pointer" }}
               />
             </Tooltipwrapper>
@@ -109,10 +91,12 @@ const Navbar = () => {
                 style={{ cursor: "pointer" }}
               />
             </Tooltipwrapper>
-            <Tooltipwrapper label="Notifications">
-              <Bell
+            <Tooltipwrapper label="Profile">
+              <User
                 size={20}
-                onClick={() => setNotificationsOpen(true)}
+                onClick={() => {
+                  navigate("/profile");
+                }}
                 style={{ cursor: "pointer" }}
               />
             </Tooltipwrapper>

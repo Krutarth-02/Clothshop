@@ -9,7 +9,6 @@ export const authApi = createApi({
   }),
 
   endpoints: (builder) => ({
-    // 🔐 Register
     register: builder.mutation({
       query: (userData) => ({
         url: "/auth/register",
@@ -17,8 +16,6 @@ export const authApi = createApi({
         body: userData,
       }),
     }),
-
-    // 🔐 Login
     login: builder.mutation({
       query: (userData) => ({
         url: "/auth/login",
@@ -26,16 +23,12 @@ export const authApi = createApi({
         body: userData,
       }),
     }),
-
-    // 👤 Get Profile (Protected Route)
     getProfile: builder.query({
       query: () => ({
         url: "/auth/profile",
-        method: "GET",
+        method:"GET",
       }),
     }),
-
-    // ✅ Forgot Password
     forgotPassword: builder.mutation({
       query: (data) => ({
         url: "/user/forgot-password",
@@ -43,8 +36,6 @@ export const authApi = createApi({
         body: data,
       }),
     }),
-
-    // ✅ Verify OTP
     verifyOtp: builder.mutation({
       query: (data) => ({
         url: "/user/verify-otp",
@@ -52,8 +43,6 @@ export const authApi = createApi({
         body: data,
       }),
     }),
-
-    // ✅ Reset Password
     resetPassword: builder.mutation({
       query: (data) => ({
         url: "/user/reset-password",
@@ -61,9 +50,22 @@ export const authApi = createApi({
         body: data,
       }),
     }),
-    searchProducts:builder.query({
-      query:(keyword)=>({
-        url:`/products/search?keyword=${keyword}`
+    searchProducts: builder.query({
+      query: (keyword) => ({
+        url: `/products/search?keyword=${keyword}`,
+        method:"GET",
+      })
+    }),
+    getProducts: builder.query({
+      query: () => ({
+        url: "/products",
+        method:'GET'
+      })
+    }),
+    getProductById: builder.query({
+      query: (id) => ({
+        url: `/products/${id}`,
+        method:'GET'
       })
     })
   }),
@@ -77,4 +79,7 @@ export const {
   useForgotPasswordMutation,
   useVerifyOtpMutation,
   useResetPasswordMutation,
+  useGetProductsQuery,
+  useSearchProductsQuery,
+  useGetProductByIdQuery,
 } = authApi;
