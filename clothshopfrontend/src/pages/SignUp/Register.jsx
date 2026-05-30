@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import {
   Box,
   Container,
@@ -11,54 +11,58 @@ import {
   Stack,
   Center,
   Anchor,
-} from "@mantine/core"
-import { useFormik } from "formik"
-import { toast } from "react-hot-toast"
-import { Link, useNavigate } from "react-router-dom"
-import { ArrowRight, Lock, Mail, User, Phone } from "lucide-react"
-import { useRegisterMutation } from "../../redux/auth/authApi"
+  Image,
+} from "@mantine/core";
+import { useFormik } from "formik";
+import { toast } from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Lock, Mail, User, Phone } from "lucide-react";
+import { useRegisterMutation } from "../../redux/auth/authApi";
+import Logo from "../../assets/icons/LOGO_1.png";
 
 const Register = () => {
-   const [register] = useRegisterMutation();
-     const navigate = useNavigate();
+  const [register,{isLoading}] = useRegisterMutation();
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       fullName: "",
       email: "",
       password: "",
-      confirmPassword: "",
       phone: "",
     },
     validate: (values) => {
-      const errors = {}
+      const errors = {};
       if (!values.fullName) {
-        errors.fullName = "Full name is required"
+        errors.fullName = "Full name is required";
       }
       if (!values.email) {
-        errors.email = "Email is required"
-      } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-        errors.email = "Invalid email address"
+        errors.email = "Email is required";
+      } else if (
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+      ) {
+        errors.email = "Invalid email address";
       }
       if (!values.phone) {
-        errors.phone = "Phone number is required"
+        errors.phone = "Phone number is required";
       }
       if (!values.password) {
-        errors.password = "Password is required"
+        errors.password = "Password is required";
       }
-      return errors
+      return errors;
     },
-    onSubmit:async (values,action ) => {
-      const res =  await register(values).unware();
-      if(res.data){
-        toast.success("Registration successful");
+    onSubmit: async (values, action) => {
+      const res = await register(values).unwrap();
+      console.log(res);
+      
+      if (res.message) {
+        toast.success(res.message);
         action.resetForm();
-        localStorage.setItem("userId", res._id);
         navigate("/login");
-      }else{
+      } else {
         toast.error("Registration failed");
       }
     },
-  })
+  });
 
   return (
     <Box
@@ -72,15 +76,7 @@ const Register = () => {
       }}
     >
       <Container size={420}>
-        <Card
-          shadow="lg"
-          radius="xl"
-          p={40}
-          style={{
-            backgroundColor: "#f8f9fa",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
-          }}
-        >
+        <Card shadow="lg" radius="xl" p={40}>
           <Center mb={30}>
             <Box
               style={{
@@ -93,7 +89,7 @@ const Register = () => {
                 justifyContent: "center",
               }}
             >
-              <ArrowRight size={28} color="#333" strokeWidth={1.5} />
+              <Image src={Logo} alt="Logo" />
             </Box>
           </Center>
 
@@ -124,7 +120,7 @@ const Register = () => {
                 name="fullName"
                 value={formik.values.fullName}
                 onChange={formik.handleChange}
-                icon={<User size={18} color="#999" />}
+                leftSection={<User size={18} />}
                 error={formik.touched.fullName && formik.errors.fullName}
                 styles={{
                   input: {
@@ -141,7 +137,7 @@ const Register = () => {
                 name="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
-                icon={<Mail size={18} color="#999" />}
+                leftSection={<Mail size={18} />}
                 error={formik.touched.email && formik.errors.email}
                 styles={{
                   input: {
@@ -158,7 +154,7 @@ const Register = () => {
                 name="phone"
                 value={formik.values.phone}
                 onChange={formik.handleChange}
-                icon={<Phone size={18} color="#999" />}
+                leftSection={<Phone size={18} />}
                 error={formik.touched.phone && formik.errors.phone}
                 styles={{
                   input: {
@@ -175,7 +171,7 @@ const Register = () => {
                 name="password"
                 value={formik.values.password}
                 onChange={formik.handleChange}
-                icon={<Lock size={18} color="#999" />}
+                leftSection={<Lock size={18} />}
                 error={formik.touched.password && formik.errors.password}
                 styles={{
                   input: {
@@ -191,21 +187,16 @@ const Register = () => {
                 fullWidth
                 size="lg"
                 type="submit"
-                loading={formik.isSubmitting}
-                style={{
-                  backgroundColor: "#1a1a1a",
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  padding: "12px 0",
-                }}
+                loading={formik.isSubmitting || isLoading}  
+                variant={formik.isSubmitting || isLoading ? "light" : "filled"}
               >
-                Create Account
+                Sign Up
               </Button>
             </Stack>
           </form>
 
           <Text align="center" size="sm" color="dimmed" mt={20}>
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Anchor component={Link} to="/login" weight={600} color="dark">
               Sign in
             </Anchor>
@@ -213,7 +204,7 @@ const Register = () => {
         </Card>
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

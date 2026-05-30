@@ -1,17 +1,27 @@
 const User = require("../models/User");
 const { sendEmail } = require("../services/emailService");
 const bcrypt = require('bcryptjs')
-const getUserProfile = async (req, res) => {
-    const { _id } = req.params; // Assuming auth middleware adds user info to req
-    const user = await User.findById(_id); // Fetch user profile from database
-    res.status(200).json({ message: "User profile retrieved successfully", data: user });
+const { normalizePublicFilePath } = require("../utils/filePath");
+const {
+    ForbiddenError,
+    BadRequestError,
+    NotFoundError,
+} = require("../utils/errors");
+
+const getUserProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id).select("-password");
+        res.status(200).json({ message: "User profile retrieved successfully", data: user });
+    } catch (error) {
+        next(error);
+    }
 }
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res, next) => {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return next(new NotFoundError("User not found"))
     }
 
     // Generate OTP
@@ -26,59 +36,56 @@ const forgotPassword = async (req, res) => {
     await sendEmail(
         email,
         "Password Reset OTP",
-        `Your OTP is ${otp}. It will expire in 5 minutes.`
+        `Your OTP is ${otp}.`
     );
 
-    res.json({ message: "OTP sent to email", data: otp });
+    res.json({ message: "OTP sent to email" });
 };
-const verifyOtp = async (req, res) => {
+const verifyOtp = async (req, res, next) => {
     try {
         const { email, otp } = req.body;
 
         // 1. Check user
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return next(new NotFoundError("User not found"))
         }
 
         // 2. Check OTP
         if (!user.otp || user.otp != otp) {
-            return res.status(400).json({ message: "Invalid OTP" });
+            return next(new BadRequestError("Invalid OTP"))
         }
 
         // 3. Check expiry
         if (user.otpExpiry < Date.now()) {
-            return res.status(400).json({ message: "OTP expired" });
+            return next(new BadRequestError("OTP expired"))
         }
-
-        // ✅ OPTIONAL (Best Practice)
+        
         user.isOtpVerified = true;
         await user.save();
 
         res.status(200).json({ message: "OTP verified successfully" });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return next(new InternalServerError(error.message))
     }
 };
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
         if (!password) {
-            return res.status(400).json({ message: "All fields required" });
+            return next(new BadRequestError("All fields required"))
         }
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return next(new NotFoundError("User not found"))
         }
 
         // 3. Check OTP verified (IMPORTANT SECURITY)
         if (!user.isOtpVerified) {
-            return res.status(403).json({
-                message: "Please verify OTP first",
-            });
+            return next(new ForbiddenError("Please verify OTP first"))
         }
 
         // 4. Hash password
@@ -99,11 +106,41 @@ const resetPassword = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return next(new InternalServerError(error.message))
     }
 };
+
+const updateProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const updateData = { ...req.body };
+
+        if (req.body.password) {
+            const isMatch = await bcrypt.compare(req.body.password, user.password);
+            if (!isMatch) {
+                return next(new ForbiddenError("Invalid password"));
+            }
+            const salt = await bcrypt.genSalt(10);
+            updateData.password = await bcrypt.hash(req.body.password, salt);
+        }
+
+        if (req.file?.path) {
+            updateData.image = normalizePublicFilePath(req.file.path);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
+            new: true,
+        }).select("-password");
+        return res
+            .status(200)
+            .json({ message: "Profile updated", data: updatedUser });
+    } catch (error) {
+        next(error);
+    }
+}
 module.exports = {
     getUserProfile,
+    updateProfile,
     forgotPassword,
     resetPassword,
     verifyOtp,

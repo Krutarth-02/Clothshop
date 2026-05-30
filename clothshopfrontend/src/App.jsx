@@ -8,6 +8,9 @@ import Home from "./pages/Home/Home";
 import { MantineProvider } from "@mantine/core";
 import MainLayout from "./routes/MainLayout";
 import PublicRoute from "./routes/PublicRoute";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import VerifyOtp from "./pages/VerifyOtp/VerifyOtp";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 
 function App() {
   const [colorScheme, setColorScheme] = React.useState(
@@ -30,6 +33,9 @@ function App() {
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
            {/* Private Routes */}
           <Route

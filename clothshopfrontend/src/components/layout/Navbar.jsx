@@ -65,6 +65,8 @@ const Navbar = ({
             colorScheme === "dark"
               ? "#1A1B1E"
               : "white",
+              border:"none",
+              borderRadius:0,
         }}
       >
         {/* NAVBAR */}
