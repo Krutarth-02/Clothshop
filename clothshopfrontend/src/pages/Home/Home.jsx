@@ -1,9 +1,12 @@
-import React from 'react'
+import { Box, Text } from "@mantine/core";
+import React from "react";
 
 const Home = () => {
   return (
-    <div>Home</div>
-  )
-}
+    <Box>
+      <Text>blfjighghdjhnjodg</Text>
+    </Box>
+  );
+};
 
-export default Home
+export default Home;

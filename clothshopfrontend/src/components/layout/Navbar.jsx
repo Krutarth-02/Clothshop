@@ -1,10 +1,4 @@
-import {
-  Box,
-  Card,
-  Divider,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
+import { Box, Card, Divider, Text, useMantineTheme } from "@mantine/core";
 
 import React from "react";
 
@@ -25,26 +19,18 @@ import {
 
 import NotificationDrawer from "./NotificationDrawer";
 
-const Navbar = ({
-  colorScheme,
-  toggleColorScheme,
-}) => {
+const Navbar = ({ colorScheme, toggleColorScheme }) => {
   const navigate = useNavigate();
 
-  const [notificationsOpen, setNotificationsOpen] =
-    React.useState(false);
+  const [notificationsOpen, setNotificationsOpen] = React.useState(false);
 
-  const [mobileMenuOpen, setMobileMenuOpen] =
-    React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const theme = useMantineTheme();
 
   const linkStyle = {
     textDecoration: "none",
-    color:
-      colorScheme === "dark"
-        ? "white"
-        : "black",
+    color: colorScheme === "dark" ? "white" : "black",
     fontWeight: 500,
   };
 
@@ -61,12 +47,9 @@ const Navbar = ({
         p={0}
         style={{
           width: "100%",
-          backgroundColor:
-            colorScheme === "dark"
-              ? "#1A1B1E"
-              : "white",
-              border:"none",
-              borderRadius:0,
+          backgroundColor: colorScheme === "dark" ? "#1A1B1E" : "white",
+          border: "none",
+          borderRadius: 0,
         }}
       >
         {/* NAVBAR */}
@@ -74,8 +57,7 @@ const Navbar = ({
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent:
-              "space-between",
+            justifyContent: "space-between",
             padding: "12px 20px",
           }}
         >
@@ -96,25 +78,22 @@ const Navbar = ({
               Home
             </Link>
 
-            <Link
-              to="/women"
-              style={linkStyle}
-            >
+            <Link to="/women" style={linkStyle}>
               Women
             </Link>
 
-            <Link
-              to="/men"
-              style={linkStyle}
-            >
+            <Link to="/men" style={linkStyle}>
               Men
             </Link>
 
-            <Link
-              to="/kids"
-              style={linkStyle}
-            >
+            <Link to="/kids" style={linkStyle}>
               Kids
+            </Link>
+            <Link to="/new-arrival" style={linkStyle}>
+              New Arrival
+            </Link>
+            <Link to="/sale" style={linkStyle}>
+              Sale
             </Link>
           </Box>
 
@@ -126,10 +105,7 @@ const Navbar = ({
               gap: "20px",
             }}
           >
-            <Search
-              size={20}
-              style={{ cursor: "pointer" }}
-            />
+            <Search size={20} style={{ cursor: "pointer" }} />
 
             {colorScheme === "light" ? (
               <Moon
@@ -137,9 +113,7 @@ const Navbar = ({
                 style={{
                   cursor: "pointer",
                 }}
-                onClick={
-                  toggleColorScheme
-                }
+                onClick={toggleColorScheme}
               />
             ) : (
               <SunMedium
@@ -147,34 +121,26 @@ const Navbar = ({
                 style={{
                   cursor: "pointer",
                 }}
-                onClick={
-                  toggleColorScheme
-                }
+                onClick={toggleColorScheme}
               />
             )}
 
             <Bell
               size={20}
               style={{ cursor: "pointer" }}
-              onClick={() =>
-                setNotificationsOpen(true)
-              }
+              onClick={() => setNotificationsOpen(true)}
             />
 
             <ShoppingBag
               size={20}
               style={{ cursor: "pointer" }}
-              onClick={() =>
-                navigate("/cart")
-              }
+              onClick={() => navigate("/cart")}
             />
 
             <User
               size={20}
               style={{ cursor: "pointer" }}
-              onClick={() =>
-                navigate("/profile")
-              }
+              onClick={() => navigate("/profile")}
             />
 
             {/* MOBILE MENU BUTTON */}
@@ -185,11 +151,7 @@ const Navbar = ({
                   style={{
                     cursor: "pointer",
                   }}
-                  onClick={() =>
-                    setMobileMenuOpen(
-                      false
-                    )
-                  }
+                  onClick={() => setMobileMenuOpen(false)}
                 />
               ) : (
                 <Menu
@@ -197,11 +159,7 @@ const Navbar = ({
                   style={{
                     cursor: "pointer",
                   }}
-                  onClick={() =>
-                    setMobileMenuOpen(
-                      true
-                    )
-                  }
+                  onClick={() => setMobileMenuOpen(true)}
                 />
               )}
             </Box>
@@ -223,24 +181,15 @@ const Navbar = ({
               Home
             </Link>
 
-            <Link
-              to="/women"
-              style={linkStyle}
-            >
+            <Link to="/women" style={linkStyle}>
               Women
             </Link>
 
-            <Link
-              to="/men"
-              style={linkStyle}
-            >
+            <Link to="/men" style={linkStyle}>
               Men
             </Link>
 
-            <Link
-              to="/kids"
-              style={linkStyle}
-            >
+            <Link to="/kids" style={linkStyle}>
               Kids
             </Link>
           </Box>
@@ -251,9 +200,7 @@ const Navbar = ({
 
       <NotificationDrawer
         open={notificationsOpen}
-        handleClose={() =>
-          setNotificationsOpen(false)
-        }
+        handleClose={() => setNotificationsOpen(false)}
       />
     </Box>
   );

@@ -20,10 +20,8 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
-  console.log(email);
 
   const [resetpassword, { isLoading }] = useResetPasswordMutation();
-  console.log(password);
 
   const handleSubmit = async () => {
     if (!password) {

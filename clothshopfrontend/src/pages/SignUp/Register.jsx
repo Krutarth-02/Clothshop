@@ -52,7 +52,6 @@ const Register = () => {
     },
     onSubmit: async (values, action) => {
       const res = await register(values).unwrap();
-      console.log(res);
       
       if (res.message) {
         toast.success(res.message);

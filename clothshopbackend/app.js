@@ -3,8 +3,10 @@ const app = express();
 const connectDB = require('./config/db');
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
+const errorHandler = require('./middlewares/error.middleware');
 app.use(cookieParser());
 require('dotenv').config();
+app.use(errorHandler);  
 // Connect to the database
 connectDB();
 

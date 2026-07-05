@@ -27,38 +27,38 @@ import axios from "axios";
 const Login = () => {
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const googleUser = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.access_token}`,
-            },
-          },
-        );
+  // const googleLogin = useGoogleLogin({
+  //   onSuccess: async (tokenResponse) => {
+  //     try {
+  //       const googleUser = await axios.get(
+  //         "https://www.googleapis.com/oauth2/v3/userinfo",
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${tokenResponse.access_token}`,
+  //           },
+  //         },
+  //       );
 
-        const { email, name, picture } = googleUser.data;
+  //       const { email, name, picture } = googleUser.data;
 
-        const res = await login({
-          email,
-          name,
-          picture,
-          googleAuth: true,
-        }).unwrap();
+  //       const res = await login({
+  //         email,
+  //         name,
+  //         picture,
+  //         googleAuth: true,
+  //       }).unwrap();
 
-        if (res.message) {
-          toast.success("Google Login Successful");
-          localStorage.setItem("userId", res.data._id);
-          navigate("/home");
-        }
-      } catch (error) {
-        console.error(error);
-        toast.error("Google Login Failed");
-      }
-    },
-  });
+  //       if (res.message) {
+  //         toast.success("Google Login Successful");
+  //         localStorage.setItem("userId", res.data._id);
+  //         navigate("/home");
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //       toast.error("Google Login Failed");
+  //     }
+  //   },
+  // });
   const validate = (values) => {
     let errors = {};
 

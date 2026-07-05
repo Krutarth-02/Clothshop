@@ -7,72 +7,70 @@ const { NotFoundError, UnauthorizedError, ForbiddenError } = require("../utils/e
 
 const LoginUser = async (req, res, next) => {
   const { email, password, rememberMe, googleAuth, name, picture } = req.body;
-  console.log(rememberMe);
-
   try {
-    if (googleAuth) {
-      if (googleAuth) {
-        let user = await User.findOne({ email });
-        
-        if (!user) {
-          user = await User.create({
-            fullName: name,
-            email,
-            isGoogleUser: true,
-            image: picture,
-          });
-        }
+    // if (googleAuth) {
+    //   if (googleAuth) {
+    //     let user = await User.findOne({ email });
 
-        const token = jwt.sign(
-          { userId: user._id },
-          process.env.JWT_SECRET,
-          { expiresIn: "15d" }
-        );
+    //     if (!user) {
+    //       user = await User.create({
+    //         fullName: name,
+    //         email,
+    //         isGoogleUser: true,
+    //         image: picture,
+    //       });
+    //     }
 
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite:
-            process.env.NODE_ENV === "production"
-              ? "None"
-              : "Lax",
-        });
+    //     const token = jwt.sign(
+    //       { userId: user._id },
+    //       process.env.JWT_SECRET,
+    //       { expiresIn: "15d" }
+    //     );
 
-        return res.status(200).json({
-          message: "Google login successful",
-          data: user,
-          token,
-        });
-      }
-      const user = await User.findOne({ email });
-      if (!user) {
-        return next(new NotFoundError("Invalid credentials"));
-      }
+    //     res.cookie("token", token, {
+    //       httpOnly: true,
+    //       secure: process.env.NODE_ENV === "production",
+    //       sameSite:
+    //         process.env.NODE_ENV === "production"
+    //           ? "None"
+    //           : "Lax",
+    //     });
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return next(new UnauthorizedError("Invalid credentials"));
-      }
-      const token = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: rememberMe ? "15d" : "7d" }
-      );
-
-      user.rememberMe = rememberMe;
-      await user.save();
-
-      // Store token in cookie
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-        maxAge: rememberMe ? 15 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 15 days or 7 days
-      });
-
-      return res.status(200).json({ message: "Login successful", data: user, token });
+    //     return res.status(200).json({
+    //       message: "Google login successful",
+    //       data: user,
+    //       token,
+    //     });
+    // }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(new ForbiddenError("email already exists"));
     }
-  } catch (error) {
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return next(new UnauthorizedError("Invalid credentials"));
+    }
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: rememberMe ? "15d" : "7d" }
+    );
+
+    user.rememberMe = rememberMe;
+    await user.save();
+
+    // Store token in cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: rememberMe ? 15 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 15 days or 7 days
+    });
+
+    return res.status(200).json({ message: "Login successful", data: user, token });
+  }
+  catch (error) {
     next(error);
   }
 };

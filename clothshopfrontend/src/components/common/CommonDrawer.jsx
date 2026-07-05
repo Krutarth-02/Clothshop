@@ -1,16 +1,18 @@
 import React from "react";
 import {
+  Box,
   Button,
   Drawer,
   Group,
   ScrollArea,
   Stack,
+  Text,
 } from "@mantine/core";
 import { SquareX } from "lucide-react";
 import toast from "react-hot-toast";
 import Tooltipwrapper from "./Tooltipwrapper";
 
-const CommonDrawer = ({ open, handleClose, title, children }) => {
+const CommonDrawer = ({ open, handleClose, title, children, width }) => {
   return (
     <Drawer
       opened={open}
@@ -22,11 +24,11 @@ const CommonDrawer = ({ open, handleClose, title, children }) => {
       scrollAreaComponent={ScrollArea.Autosize}
       closeButtonProps={{
         icon: (
-          <Tooltipwrapper label='close' arrowOffset={30}>
+          <Tooltipwrapper label="close" arrowOffset={30}>
             <SquareX
               size={24}
               color="red"
-              style={{ cursor:'pointer', borderRadius: "20%" ,border:'none' }}
+              style={{ cursor: "pointer", borderRadius: "20%", border: "none" }}
             />
           </Tooltipwrapper>
         ),
@@ -39,6 +41,7 @@ const CommonDrawer = ({ open, handleClose, title, children }) => {
         </Button>
         <Button onClick={() => toast.error("confirm-action")}>Delete</Button>
       </Group>
+ 
     </Drawer>
   );
 };
