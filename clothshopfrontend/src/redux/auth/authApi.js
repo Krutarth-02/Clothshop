@@ -1,13 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { api } from "../api/api";
 
-export const authApi = createApi({
-  reducerPath: "authApi",
-
-  baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3000/api", // backend URL
-    credentials: "include", // for cookies 
-  }),
-
+export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -24,10 +17,14 @@ export const authApi = createApi({
       }),
     }),
     getProfile: builder.query({
+      providesTags: ["Profile"],
       query: () => ({
-        url: "/auth/profile",
-        method:"GET",
+        url: "/user/profile",
+        method: "GET",
       }),
+    }),
+    logout: builder.mutation({
+      query: () => ({ url: "/auth/logout", method: "POST" }),
     }),
     forgotPassword: builder.mutation({
       query: (data) => ({
@@ -50,24 +47,6 @@ export const authApi = createApi({
         body: data,
       }),
     }),
-    searchProducts: builder.query({
-      query: (keyword) => ({
-        url: `/products/search?keyword=${keyword}`,
-        method:"GET",
-      })
-    }),
-    getProducts: builder.query({
-      query: () => ({
-        url: "/products",
-        method:'GET'
-      })
-    }),
-    getProductById: builder.query({
-      query: (id) => ({
-        url: `/products/${id}`,
-        method:'GET'
-      })
-    })
   }),
 });
 
@@ -76,10 +55,8 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetProfileQuery,
+  useLogoutMutation,
   useForgotPasswordMutation,
   useVerifyOtpMutation,
   useResetPasswordMutation,
-  useGetProductsQuery,
-  useSearchProductsQuery,
-  useGetProductByIdQuery,
 } = authApi;

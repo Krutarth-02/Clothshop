@@ -1,163 +1,229 @@
-import React from 'react'
-import { Box, Container, Grid, Stack, Text, Group, ActionIcon } from '@mantine/core'
-// import { Instagram, Twitter, Pinterest } from 'lucide-react'
+import {
+  Anchor,
+  Box,
+  Container,
+  Grid,
+  Group,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { Link } from "react-router-dom";
+import BrandLogo from "../common/BrandLogo";
 
-const Footer = () => {
+const footerLinkGroups = [
+  {
+    title: "EXPLORE",
+    links: [
+      {
+        label: "Home",
+        to: "/",
+      },
+      {
+        label: "Shop All",
+        to: "/shop",
+      },
+      {
+        label: "New Arrivals",
+        to: "/new-arrivals",
+      },
+      {
+        label: "Women",
+        to: "/women",
+      },
+      {
+        label: "Men",
+        to: "/men",
+      },
+      {
+        label: "Accessories",
+        to: "/accessories",
+      },
+      {
+        label: "About Us",
+        to: "/about",
+      },
+    ],
+  },
+  {
+    title: "YOUR CEVRALIQ",
+    links: [
+      { to: "/cart", label: "Shopping bag" },
+      {
+        label: "Sign in",
+        to: "/login",
+      },
+      {
+        label: "Create account",
+        to: "/register",
+      },
+      {
+        label: "Password help",
+        to: "/forgot-password",
+      },
+    ],
+  },
+];
+
+export default function Footer() {
   return (
-    <Box style={(theme) => ({
-      backgroundColor: '#1a1a1a',
-      color: '#e0e0e0',
-      padding: '60px 0 40px',
-      marginTop: 'auto',
-      borderTop: `1px solid ${theme.colors.dark[5]}`,
-    })}>
-      <Container size="" px="xl">
-        {/* Main Footer Content */}
-        <Grid gutter="xl" mb={60}>
-          {/* Brand Section */}
-          <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-            <Stack gap="md">
-              <Text fw={700} size="xl" style={{ letterSpacing: '2px' }}>
-                MAISON
-              </Text>
-              <Text size="sm" c="#999">
-                Premium fashion for the modern lifestyle. Curated collections from around the world.
-              </Text>
-            </Stack>
+    <Box
+      className="fashion-footer"
+      component="footer"
+      pt={{ base: 40, md: 65 }}
+      pb={25}
+      style={{
+        background: "#1a1a1a",
+        color: "#e0e0e0",
+        overflow: "hidden",
+      }}
+    >
+      <Container>
+        <Grid
+          gutter={{
+            base: 35,
+            md: 50,
+          }}
+        >
+          <Grid.Col
+            span={{
+              base: 12,
+              sm: 6,
+              md: 4,
+            }}
+          >
+            <Anchor
+              component={Link}
+              to="/"
+              underline="never"
+              c="#f3f0e8"
+              aria-label="Cevraliq home"
+            >
+              <BrandLogo />
+            </Anchor>
+            <Text size="sm" c="#aaa" lh={1.9} mt={23}>
+              Premium fashion for the modern lifestyle.
+              <br />
+              Your style. Your story. Your Cevraliq.
+            </Text>
           </Grid.Col>
-
-          {/* Shop Section */}
-          <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-            <Stack gap="md">
-              <Text fw={600} size="sm">
-                Shop
-              </Text>
-              <Stack gap="xs">
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Women
+          {footerLinkGroups.map((group) => (
+            <Grid.Col
+              key={group.title}
+              span={{
+                base: 12,
+                xs: 6,
+                sm: 3,
+                md: 2,
+              }}
+            >
+              <Stack gap={12}>
+                <Text size="xs" c="#deded1" mb={6} style={{ letterSpacing: 2 }}>
+                  {group.title}
                 </Text>
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Men
-                </Text>
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Kids
-                </Text>
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Sale
-                </Text>
+                {group.links.map((link) => (
+                  <Anchor
+                    key={link.label}
+                    component={Link}
+                    to={link.to}
+                    c="#aaa"
+                    size="sm"
+                    underline="hover"
+                    style={{
+                      minHeight: 44,
+                      display: "flex",
+                      alignItems: "center",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {link.label}
+                  </Anchor>
+                ))}
               </Stack>
-            </Stack>
-          </Grid.Col>
-
-          {/* Help Section */}
-          <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-            <Stack gap="md">
-              <Text fw={600} size="sm">
-                Help
-              </Text>
-              <Stack gap="xs">
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Contact Us
-                </Text>
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Shipping Info
-                </Text>
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  Returns
-                </Text>
-                <Text size="sm" c="#999" style={{ cursor: 'pointer' }} className="footer-link">
-                  FAQ
-                </Text>
-              </Stack>
-            </Stack>
-          </Grid.Col>
-
-          {/* Connect Section */}
-          <Grid.Col span={{ base: 12, sm: 6, md: 2 }}>
-            <Stack gap="md">
-              <Text fw={600} size="sm">
-                Connect
-              </Text>
-              <Group gap="lg">
-                {/* <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  size="lg"
-                  radius="50%"
-                  sx={{
-                    border: '2px solid #666',
-                    '&:hover': { borderColor: '#e0e0e0', color: '#e0e0e0' },
-                  }}
-                >
-                  <Instagram size={20} />
-                </ActionIcon>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  size="lg"
-                  radius="50%"
-                  sx={{
-                    border: '2px solid #666',
-                    '&:hover': { borderColor: '#e0e0e0', color: '#e0e0e0' },
-                  }}
-                >
-                  <Twitter size={20} />
-                </ActionIcon>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  size="lg"
-                  radius="50%"
-                  sx={{
-                    border: '2px solid #666',
-                    '&:hover': { borderColor: '#e0e0e0', color: '#e0e0e0' },
-                  }}
-                >
-                  <Pinterest size={20} />
-                </ActionIcon> */}
-              </Group>
-            </Stack>
+            </Grid.Col>
+          ))}
+          <Grid.Col
+            span={{
+              base: 12,
+              md: 4,
+            }}
+          >
+            <Text size="xs" c="#aaa" mb={18} style={{ letterSpacing: 2 }}>
+              A PERSONAL PERSPECTIVE
+            </Text>
+            <Title order={3} size="28px" mb={20}>
+              Make room
+              <br />
+              for something you.
+            </Title>
+            <Anchor
+              component={Link}
+              to="/register"
+              c="#deded1"
+              size="sm"
+              underline="always"
+              style={{
+                minHeight: 44,
+                display: "inline-flex",
+                alignItems: "center",
+              }}
+            >
+              Join Cevraliq &nearr;
+            </Anchor>
           </Grid.Col>
         </Grid>
-
-        {/* Bottom Footer */}
-        <Box style={{ borderTop: '1px solid #333', paddingTop: '30px' }}>
-          <Group justify="space-between" align="center" wrap="wrap">
-            <Text size="sm" c="#999">
-              2024 MAISON. All rights reserved.
-            </Text>
-            <Group gap="md">
-              <Text
-                size="sm"
-                c="#999"
-                style={{ cursor: 'pointer' }}
-                className="footer-link"
-              >
-                Privacy Policy
-              </Text>
-              <Text
-                size="sm"
-                c="#999"
-                style={{ cursor: 'pointer' }}
-                className="footer-link"
-              >
-                Terms of Service
-              </Text>
-            </Group>
-          </Group>
-        </Box>
+        <Text
+          aria-hidden="true"
+          mt={30}
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "clamp(60px, 16vw, 260px)",
+            lineHeight: 1.3,
+            letterSpacing: "-.075em",
+            opacity: 0.14,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Cevraliq.
+        </Text>
+        <Group
+          justify="space-between"
+          gap="md"
+          mt={20}
+          pt={25}
+          style={{
+            borderTop: "1px solid #444",
+            color: "#999",
+          }}
+        >
+          <Text size="xs">
+            &copy;
+            {new Date().getFullYear()}
+            Cevraliq. All rights reserved.
+          </Text>
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            c="#deded1"
+            style={{ minHeight: 44 }}
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+                  .matches
+                  ? "instant"
+                  : "smooth",
+              })
+            }
+          >
+            Back to top
+          </Anchor>
+          {/* <Eyebrow size="8px" visibleFrom="sm">
+            INDIVIDUAL BY DESIGN
+          </Eyebrow> */}
+        </Group>
       </Container>
-
-      <style>{`
-        .footer-link {
-          transition: color 0.2s ease;
-        }
-        .footer-link:hover {
-          color: #e0e0e0;
-        }
-      `}</style>
     </Box>
-  )
+  );
 }
-
-export default Footer

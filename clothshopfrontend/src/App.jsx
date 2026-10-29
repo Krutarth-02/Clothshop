@@ -11,6 +11,12 @@ import PublicRoute from "./routes/PublicRoute";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import { theme } from "../theme";
+import Shop from "./pages/Shop/Shop";
+import About from "./pages/About/About";
+import ProductDetails from "./pages/Product/ProductDetails";
+import Cart from "./pages/Cart/Cart";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 function App() {
   const [colorScheme, setColorScheme] = React.useState(
@@ -25,11 +31,11 @@ function App() {
     });
   };
   return (
-    <MantineProvider forceColorScheme={colorScheme}>
+    <MantineProvider theme={theme} forceColorScheme={colorScheme || "light"}>
       <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
-           {/* Public Routes */}
+          {/* Authentication Routes */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -37,7 +43,10 @@ function App() {
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
-           {/* Private Routes */}
+          <Route element={<PrivateRoute requiredRole="admin" />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
+          {/* Storefront Routes */}
           <Route
             element={
               <MainLayout
@@ -46,8 +55,27 @@ function App() {
               />
             }
           >
+            <Route path="/" element={<Home />} />
+            <Route path="/shop" element={<Shop key="all" collection="all" />} />
+            <Route
+              path="/new-arrivals"
+              element={<Shop key="new" collection="new" />}
+            />
+            <Route
+              path="/women"
+              element={<Shop key="women" collection="women" />}
+            />
+            <Route path="/men" element={<Shop key="men" collection="men" />} />
+            <Route
+              path="/accessories"
+              element={<Shop key="accessories" collection="accessories" />}
+            />
+            <Route path="/about" element={<About />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Cart checkout />} />
             <Route element={<PrivateRoute />}>
-              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Home />} />
             </Route>
           </Route>
         </Routes>

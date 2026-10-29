@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded; // store user info
         next();
     } catch (error) {
-        return res.status(403).json({ message: 'Invalid token' });
+        return res.status(401).json({ message: 'Invalid or expired session' });
     }
 };
 

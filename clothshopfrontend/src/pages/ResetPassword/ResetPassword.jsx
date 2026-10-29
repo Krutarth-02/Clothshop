@@ -1,20 +1,18 @@
-import React, { useState } from "react";
 import {
-  Box,
-  Container,
-  Card,
-  PasswordInput,
-  Button,
-  Text,
-  Stack,
-  Center,
-  Image,
-} from "@mantine/core";
-import { ArrowRight, Lock } from "lucide-react";
+  AuthField,
+  AuthSubmit,
+  AuthBackLink,
+  RecoveryPrompt,
+} from "../../components/common/AuthControls";
+import { useState } from "react";
+import { Stack } from "@mantine/core";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { Lock } from "lucide-react";
+
 import { useResetPasswordMutation } from "../../redux/auth/authApi";
-import Logo from "../../assets/icons/LOGO_1.png";
-import toast from "react-hot-toast";
-import { useLocation, useNavigate } from "react-router";
+import AuthLayout from "../../components/common/AuthLayout";
+
 const ResetPassword = () => {
   const [password, setNewPassword] = useState("");
   const navigate = useNavigate();
@@ -45,87 +43,50 @@ const ResetPassword = () => {
     }
   };
 
+  if (!email) {
+    return (
+      <RecoveryPrompt
+        title="Recover your account."
+        description="Enter your email and verify the code we send before choosing a new password."
+      >
+        Start password recovery
+      </RecoveryPrompt>
+    );
+  }
+
   return (
-    <Box
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #a8d8f0 0%, #c5e3f6 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "20px",
-      }}
+    <AuthLayout
+      title="Back to a good place."
+      description="Choose a new password to finish recovering your Cevraliq account."
     >
-      <Container size={420}>
-        <Card
-          shadow="lg"
-          radius="xl"
-          p={40}
-          style={{
-            backgroundColor: "#f8f9fa",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <Center mb={30}>
-            <Box
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: "12px",
-                backgroundColor: "#e8f0f7",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image src={Logo} alt="Logo" />
-            </Box>
-          </Center>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (password && !isLoading) handleSubmit();
+        }}
+      >
+        <Stack gap={20}>
+          <AuthField
+            password
+            autoComplete="new-password"
+            label="New password"
+            value={password}
+            onChange={(event) => setNewPassword(event.currentTarget.value)}
+            icon={<Lock size={18} color="#999" />}
+          />
 
-          <Text
-            align="center"
-            size="xl"
-            weight={700}
-            mb={12}
-            style={{ fontSize: "24px", color: "#1a1a1a" }}
+          <AuthSubmit
+            disabled={!password}
+            variant={!password ? "light" : "filled"}
+
+            loading={isLoading}
           >
-            Reset your password
-          </Text>
-
-          <Text
-            align="center"
-            size="sm"
-            color="dimmed"
-            mb={30}
-            style={{ fontSize: "14px", lineHeight: 1.5 }}
-          >
-            Enter your new password and confirm it to finish resetting your
-            account.
-          </Text>
-
-          <Stack gap={20}>
-            <PasswordInput
-              placeholder="New password"
-              value={password}
-              onChange={(event) => setNewPassword(event.currentTarget.value)}
-              leftSection={<Lock size={18} color="#999" />}
-            />
-
-            <Button
-              fullWidth
-              size="lg"
-              type="submit"
-              disabled={!password}
-              variant={!password ? "light" : "filled"}
-              onClick={handleSubmit}
-              loading={isLoading}
-            >
-              Save password
-            </Button>
-          </Stack>
-        </Card>
-      </Container>
-    </Box>
+            Save password
+          </AuthSubmit>
+        </Stack>
+      </form>
+      <AuthBackLink />
+    </AuthLayout>
   );
 };
 

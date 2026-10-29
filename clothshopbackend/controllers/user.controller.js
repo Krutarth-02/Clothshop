@@ -6,11 +6,13 @@ const {
     ForbiddenError,
     BadRequestError,
     NotFoundError,
+    UnauthorizedError,
 } = require("../utils/errors");
 
 const getUserProfile = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user._id).select("-password");
+        const user = await User.findById(req.user._id).select("-password -otp -otpExpiry -isOtpVerified");
+        if (!user) return next(new UnauthorizedError("Session user no longer exists"));
         res.status(200).json({ message: "User profile retrieved successfully", data: user });
     } catch (error) {
         next(error);
@@ -113,7 +115,8 @@ const resetPassword = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
-        const updateData = { ...req.body };
+        if (!user) return next(new UnauthorizedError("Session user no longer exists"));
+        const updateData = {...req.body};
 
         if (req.body.password) {
             const isMatch = await bcrypt.compare(req.body.password, user.password);
@@ -128,9 +131,9 @@ const updateProfile = async (req, res, next) => {
             updateData.image = normalizePublicFilePath(req.file.path);
         }
 
-        const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
+        const updatedUser = await User.findByIdAndUpdate(req.user.userId, updateData, {
             new: true,
-        }).select("-password");
+        }).select("-password -otp -otpExpiry -isOtpVerified");
         return res
             .status(200)
             .json({ message: "Profile updated", data: updatedUser });
