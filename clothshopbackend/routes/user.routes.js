@@ -1,21 +1,26 @@
-const router = require("express").Router();
-const { getUserProfile, forgotPassword, verifyOtp, resetPassword, updateProfile } = require("../controllers/user.controller");
-const authMiddleware = require('../middlewares/auth.middleware')
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./public/uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "." + file.originalname);
-  },
+﻿const router = require("express").Router();
+const {
+  getUserProfile,
+  deleteAccount,
+  updateProfile,
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
+} = require("../controllers/user.controller");
+const authMiddleware = require("../middlewares/auth.middleware");
+const { apiLimiter } = require("../middlewares/rateLimiter.middleware");
+const rateLimit = require("express-rate-limit");
+const recoveryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  message: { message: "Too many recovery attempts. Please try again later." },
 });
-const upload = multer({ storage: storage });
-
 // Get user profile
-router.get('/profile',authMiddleware, getUserProfile)
-.post("/forgot-password", forgotPassword)
-.post("/verify-otp", verifyOtp)
-.post("/reset-password", resetPassword)
-.put("/update-profile", upload.single("image"), authMiddleware, updateProfile);
+router
+  .get("/profile", authMiddleware, getUserProfile)
+  .post("/forgot-password", recoveryLimiter, forgotPassword)
+  .post("/verify-otp", recoveryLimiter, verifyOtp)
+  .post("/reset-password", recoveryLimiter, resetPassword)
+  .put("/update-profile", authMiddleware, updateProfile)
+  .delete("/account", authMiddleware, apiLimiter, deleteAccount);
 module.exports = router;

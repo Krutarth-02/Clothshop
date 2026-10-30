@@ -22,20 +22,18 @@ app.use(express.urlencoded({ extended: true }));
 const authRoute = require("./routes/auth.routes");
 const productRoute = require("./routes/product.routes");
 const userRoute = require("./routes/user.routes");
-const adminRoute = require("/routes/admin.routes");
+const notificationRoute = require("./routes/notification.routes")
+
 
 app.use("/api/auth", authRoute);
 app.use("/api/products", productRoute);
 app.use("/api/user", userRoute);
-app.use("/api/admin", adminRoute);
+app.use("/api/notifications", notificationRoute);
 app.use(errorHandler);
 
-// Both customer and admin accounts run in this same server process.
-const initializeAdmin = require("./config/admin");
 const port = process.env.PORT || 3000;
 async function startServer() {
   await connectDB();
-  await initializeAdmin();
   app.listen(port, () => console.log("Server is running on port " + port));
 }
 startServer().catch((error) => {

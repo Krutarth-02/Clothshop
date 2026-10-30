@@ -22,7 +22,7 @@ const VerifyOtp = () => {
     try {
       const res = await verify({ email, otp }).unwrap();
       toast.success(res.message);
-      navigate("/reset-password", { state: { email } });
+      navigate("/reset-password", { state: { email, resetToken: res.resetToken } });
     } catch {
       toast.error("Failed to verify OTP");
     }

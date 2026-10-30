@@ -27,7 +27,7 @@ const sendEmail = async (to, subject, otp) => {
 
     console.log("Email sent successfully");
   } catch (error) {
-    console.log("Email error:", error);
+    throw new Error("Unable to send verification email. Please try again later.", { cause: error });
   }
 };
 

@@ -1,4 +1,4 @@
-import { api } from "../api/api";
+﻿import { api } from "../api/api";
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -22,6 +22,13 @@ export const authApi = api.injectEndpoints({
         url: "/user/profile",
         method: "GET",
       }),
+    }),
+    updateProfile: builder.mutation({
+      query: (body) => ({ url: "/user/update-profile", method: "PUT", body }),
+      invalidatesTags: (result, error) => (error ? [] : ["Profile"]),
+    }),
+    deleteAccount: builder.mutation({
+      query: (body) => ({ url: "/user/account", method: "DELETE", body }),
     }),
     logout: builder.mutation({
       query: () => ({ url: "/auth/logout", method: "POST" }),
@@ -55,8 +62,11 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetProfileQuery,
+  useUpdateProfileMutation,
+  useDeleteAccountMutation,
   useLogoutMutation,
   useForgotPasswordMutation,
   useVerifyOtpMutation,
   useResetPasswordMutation,
 } = authApi;
+

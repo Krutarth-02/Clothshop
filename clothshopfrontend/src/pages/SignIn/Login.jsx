@@ -44,6 +44,7 @@ const Login = () => {
         if (res.data) {
           toast.success(res.message);
           localStorage.setItem("userId", res.data._id);
+          localStorage.setItem("role", res.data.role);
           dispatch(api.util.resetApiState());
           await dispatch(
             api.util.upsertQueryData("getProfile", undefined, {
@@ -51,7 +52,7 @@ const Login = () => {
             }),
           );
           action.resetForm();
-          navigate(res.data.role === "admin" ? "/admin" : "/home");
+          navigate("/home");
         } else {
           toast.error("Login failed");
         }

@@ -15,7 +15,7 @@ export default function PublicRoute() {
     );
   if (signedIn && data?.data)
     return (
-      <Navigate to={data.data.role === "admin" ? "/admin" : "/home"} replace />
+      <Navigate to="/home" replace />
     );
   return <Outlet />;
 }

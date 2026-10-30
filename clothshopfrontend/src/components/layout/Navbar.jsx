@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../../redux/auth/authApi";
+import { useGetNotificationsQuery } from "../../redux/notifications/notificationApi";
 import { selectCartCount } from "../../redux/cart/cartSlice";
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
@@ -21,13 +22,20 @@ import {
 } from "@mantine/core";
 import {
   ArrowUpRight,
+  Bell,
   ChevronDown,
   Moon,
+  Gift,
+  LogOut,
+  Trash2,
   ShoppingBag,
   SunMedium,
   User,
 } from "lucide-react";
 import BrandLogo from "../common/BrandLogo";
+import NotificationDrawer from "./NotificationDrawer";
+import DeleteAccountModal from "../common/DeleteAccountModal";
+import useAccountActions from "../../hooks/useAccountActions";
 
 const shopLinks = [
   {
@@ -84,15 +92,85 @@ const accountLinks = [
 
 export default function Navbar({ colorScheme, toggleColorScheme }) {
   const cartCount = useSelector(selectCartCount);
-  const { data: profile } = useGetProfileQuery(undefined, {
-    skip: !localStorage.getItem("userId"),
-  });
-  const isAdmin = profile?.data?.role === "admin";
+  const signedIn = Boolean(localStorage.getItem("userId"));
+  const {
+    data: profile,
+    isLoading: checkingAccount,
+    error: profileError,
+    refetch: retryProfile,
+  } = useGetProfileQuery(undefined, { skip: !signedIn });
+  const user = signedIn && !profileError ? profile?.data : null;
+  const { signOut, signingOut } = useAccountActions();
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const { data: notifications } = useGetNotificationsQuery(undefined, {
+    skip: !signedIn,
+    pollingInterval: 60000,
+    refetchOnMountOrArgChange: true,
+  });
+  const unreadCount = signedIn ? notifications?.unreadCount || 0 : 0;
   const { pathname } = useLocation();
   const theme = useMantineTheme();
   const desktop = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`);
   const { gutter = { base: 16, sm: 24, lg: 40 } } = theme.other || {};
+
+  const accountItems = user
+    ? [
+        { label: "My profile", to: "/profile", icon: <User size={17} /> },
+        { label: "Shopping bag", to: "/cart", icon: <ShoppingBag size={17} /> },
+        {
+          label: "Notifications",
+          icon: <Gift size={17} />,
+          action: () => setNotificationsOpen(true),
+        },
+        {
+          label: signingOut ? "Signing out..." : "Sign out",
+          icon: <LogOut size={17} />,
+          action: signOut,
+        },
+        {
+          label: "Delete account",
+          icon: <Trash2 size={17} />,
+          danger: true,
+          action: () => setDeleteOpen(true),
+        },
+      ]
+    : signedIn
+      ? checkingAccount
+        ? []
+        : [{ label: "Retry account", action: retryProfile }]
+      : accountLinks;
+  const renderAccountItems = (mobile = false) =>
+    accountItems.map((item) => {
+      const Item = mobile ? Button : Menu.Item;
+      return (
+        <Item
+          key={item.label}
+          {...(item.to ? { component: Link, to: item.to } : {})}
+          leftSection={item.icon}
+          color={item.danger ? "red" : mobile ? "gray" : undefined}
+          {...(mobile ? { variant: "subtle", fullWidth: true } : {})}
+          disabled={signingOut}
+          style={{
+            minHeight: 44,
+            ...(mobile
+              ? {
+                  height: "auto",
+                  justifyContent: "flex-start",
+                  textAlign: "left",
+                }
+              : {}),
+          }}
+          onClick={() => {
+            setMenuOpen(false);
+            if (item.action) void item.action();
+          }}
+        >
+          {item.label}
+        </Item>
+      );
+    });
 
   return (
     <>
@@ -161,7 +239,36 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               </Anchor>
             ))}
           </Group>
-          <Group gap={8} wrap="nowrap" style={{ flexShrink: 0 }}>
+          <Group
+            gap={{ base: 4, sm: 8 }}
+            wrap="nowrap"
+            style={{ flexShrink: 0 }}
+          >
+            <Indicator
+              disabled={!unreadCount}
+              size={8}
+              color="green"
+              offset={7}
+            >
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                size={44}
+                aria-label={
+                  unreadCount
+                    ? `Notifications, ${unreadCount} unread`
+                    : "Notifications"
+                }
+                aria-haspopup="dialog"
+                aria-expanded={notificationsOpen}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setNotificationsOpen(true);
+                }}
+              >
+                <Bell size={20} />
+              </ActionIcon>
+            </Indicator>
             <Indicator
               label={cartCount > 99 ? "99+" : cartCount}
               disabled={!cartCount}
@@ -201,31 +308,22 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
                     variant="subtle"
                     color="gray"
                     size="compact-sm"
+                    loading={signingOut || (signedIn && checkingAccount)}
                     leftSection={<User size={18} />}
                     rightSection={<ChevronDown size={14} />}
                   >
-                    Account &amp; Help
+                    {user ? "My account" : "Account"}
                   </Button>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Label>Your Cevraliq</Menu.Label>
-                  {isAdmin && (
-                    <Menu.Item component={Link} to="/admin">
-                      Store dashboard
-                    </Menu.Item>
-                  )}
-                  {accountLinks.slice(0, 2).map((link) => (
-                    <Menu.Item key={link.to} component={Link} to={link.to}>
-                      {link.label}
-                    </Menu.Item>
-                  ))}
-                  <Menu.Divider />
-                  <Menu.Label>Password recovery</Menu.Label>
-                  {accountLinks.slice(2).map((link) => (
-                    <Menu.Item key={link.to} component={Link} to={link.to}>
-                      {link.label}
-                    </Menu.Item>
-                  ))}
+                  <Menu.Label style={{ overflowWrap: "anywhere" }}>
+                    {user
+                      ? user.fullName
+                      : signedIn
+                        ? "Checking your account"
+                        : "Your Cevraliq"}
+                  </Menu.Label>
+                  {renderAccountItems()}
                 </Menu.Dropdown>
               </Menu>
             </Box>
@@ -243,6 +341,16 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
           </Group>
         </Group>
       </Box>
+      {deleteOpen && user && (
+        <DeleteAccountModal
+          email={user.email}
+          onClose={() => setDeleteOpen(false)}
+        />
+      )}
+      <NotificationDrawer
+        open={notificationsOpen}
+        handleClose={() => setNotificationsOpen(false)}
+      />
       <Drawer
         opened={menuOpen && !desktop}
         onClose={() => setMenuOpen(false)}
@@ -317,37 +425,19 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
           </Button>
           <Divider />
           <Text size="xs" c="dimmed" style={{ letterSpacing: 2 }}>
-            ACCOUNT &amp; HELP
+            {user ? "MY ACCOUNT" : "ACCOUNT & HELP"}
           </Text>
-          {isAdmin && (
-            <Anchor
-              component={Link}
-              to="/admin"
-              onClick={() => setMenuOpen(false)}
-              c="var(--mantine-color-text)"
-              fw={600}
-              py="sm"
-            >
-              Store dashboard
-            </Anchor>
+          {user && (
+            <Text size="sm" style={{ overflowWrap: "anywhere" }}>
+              {user.fullName}
+            </Text>
           )}
-          {accountLinks.map((link) => (
-            <Anchor
-              key={link.to}
-              component={Link}
-              to={link.to}
-              onClick={() => setMenuOpen(false)}
-              size="sm"
-              c="var(--mantine-color-text)"
-              underline="hover"
-              style={{ display: "block", paddingBlock: 12, minHeight: 44 }}
-            >
-              <Group justify="space-between">
-                {link.label}
-                <ArrowUpRight size={16} />
-              </Group>
-            </Anchor>
-          ))}
+          {signedIn && checkingAccount && (
+            <Text size="sm" c="dimmed">
+              Checking your account...
+            </Text>
+          )}
+          {renderAccountItems(true)}
         </Stack>
       </Drawer>
     </>

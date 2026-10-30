@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { Alert, Button, Center, Loader, Stack } from "@mantine/core";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
-export default function PrivateRoute({ requiredRole }) {
+export default function PrivateRoute() {
   const signedIn = Boolean(localStorage.getItem("userId"));
   const { data, isLoading, isFetching, error, refetch } = useGetProfileQuery(
     undefined,
@@ -31,7 +31,5 @@ export default function PrivateRoute({ requiredRole }) {
         </Stack>
       </Center>
     );
-  if (requiredRole && data.data.role !== requiredRole)
-    return <Navigate to="/home" replace />;
   return <Outlet />;
 }

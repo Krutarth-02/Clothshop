@@ -18,6 +18,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
+  const resetToken = location.state?.resetToken;
 
   const [resetpassword, { isLoading }] = useResetPasswordMutation();
 
@@ -31,6 +32,7 @@ const ResetPassword = () => {
       const res = await resetpassword({
         email,
         password,
+        resetToken,
       }).unwrap();
 
       toast.success(res.message);
@@ -43,7 +45,7 @@ const ResetPassword = () => {
     }
   };
 
-  if (!email) {
+  if (!email || !resetToken) {
     return (
       <RecoveryPrompt
         title="Recover your account."
@@ -70,6 +72,9 @@ const ResetPassword = () => {
             password
             autoComplete="new-password"
             label="New password"
+            required
+            minLength={8}
+            maxLength={72}
             value={password}
             onChange={(event) => setNewPassword(event.currentTarget.value)}
             icon={<Lock size={18} color="#999" />}

@@ -43,6 +43,7 @@ export const baseQueryWithAuth = async (args, api, extraOptions) => {
     try {
       signedIn = Boolean(window.localStorage.getItem("userId"));
       if (signedIn) window.localStorage.removeItem("userId");
+      window.localStorage.removeItem("role");
     } catch {
       // Storage can be unavailable; the caller still receives the API error.
     }

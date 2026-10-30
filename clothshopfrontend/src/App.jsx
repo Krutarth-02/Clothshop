@@ -16,7 +16,7 @@ import Shop from "./pages/Shop/Shop";
 import About from "./pages/About/About";
 import ProductDetails from "./pages/Product/ProductDetails";
 import Cart from "./pages/Cart/Cart";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   const [colorScheme, setColorScheme] = React.useState(
@@ -42,9 +42,6 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-          </Route>
-          <Route element={<PrivateRoute requiredRole="admin" />}>
-            <Route path="/admin" element={<AdminDashboard />} />
           </Route>
           {/* Storefront Routes */}
           <Route
@@ -76,6 +73,7 @@ function App() {
             <Route path="/checkout" element={<Cart checkout />} />
             <Route element={<PrivateRoute />}>
               <Route path="/home" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Route>
         </Routes>

@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { recordSuccessfulLogin } = require("../services/loginActivity");
 const {
   NotFoundError,
   UnauthorizedError,
@@ -44,7 +45,7 @@ const LoginUser = async (req, res, next) => {
     //       token,
     //     });
     // }
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
       return next(new ForbiddenError("email already exists"));
     }
@@ -57,8 +58,8 @@ const LoginUser = async (req, res, next) => {
       expiresIn: rememberMe ? "15d" : "7d",
     });
 
-    user.rememberMe = rememberMe;
-    await user.save();
+    user = await recordSuccessfulLogin(user, rememberMe);
+    if (!user) return next(new UnauthorizedError("Account no longer exists"));
 
     // Store token in cookie
     res.cookie("token", token, {
@@ -68,9 +69,12 @@ const LoginUser = async (req, res, next) => {
       maxAge: rememberMe ? 15 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 15 days or 7 days
     });
 
+    const safeUser = user.toObject();
+    for (const field of ["password", "otp", "otpExpiry", "isOtpVerified"])
+      delete safeUser[field];
     return res
       .status(200)
-      .json({ message: "Login successful", data: user, token });
+      .json({ message: "Login successful", data: safeUser, token });
   } catch (error) {
     next(error);
   }
@@ -79,7 +83,6 @@ const LoginUser = async (req, res, next) => {
 const SignupUser = async (req, res, next) => {
   const { fullName, email, password } = req.body;
   try {
-    
     const user = await User.findOne({ email });
     if (user) {
       return next(new ForbiddenError("User already exists"));
@@ -89,6 +92,7 @@ const SignupUser = async (req, res, next) => {
       fullName,
       email,
       password: hashedPassword,
+      role: "user",
     });
 
     await newUser.save();
@@ -102,7 +106,8 @@ const LogoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
   });
   res.status(200).json({ message: "Logout successful" });
 };
