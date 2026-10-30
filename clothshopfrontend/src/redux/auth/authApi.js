@@ -23,6 +23,10 @@ export const authApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    getPayments: builder.query({
+      query: () => "/payments",
+      providesTags: ["Payments"],
+    }),
     updateProfile: builder.mutation({
       query: (body) => ({ url: "/user/update-profile", method: "PUT", body }),
       invalidatesTags: (result, error) => (error ? [] : ["Profile"]),
@@ -62,6 +66,7 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetProfileQuery,
+  useGetPaymentsQuery,
   useUpdateProfileMutation,
   useDeleteAccountMutation,
   useLogoutMutation,
@@ -69,4 +74,3 @@ export const {
   useVerifyOtpMutation,
   useResetPasswordMutation,
 } = authApi;
-

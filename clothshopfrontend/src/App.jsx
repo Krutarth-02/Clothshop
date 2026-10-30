@@ -17,6 +17,8 @@ import About from "./pages/About/About";
 import ProductDetails from "./pages/Product/ProductDetails";
 import Cart from "./pages/Cart/Cart";
 import Profile from "./pages/Profile/Profile";
+import GuidancePage from "./pages/Guidance/GuidancePage";
+import { guidancePages } from "./data/guidance";
 
 function App() {
   const [colorScheme, setColorScheme] = React.useState(
@@ -68,6 +70,9 @@ function App() {
               element={<Shop key="accessories" collection="accessories" />}
             />
             <Route path="/about" element={<About />} />
+            {guidancePages.map((page) => (
+              <Route key={page.path} path={page.path} element={<GuidancePage key={page.path} page={page} />} />
+            ))}
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Cart checkout />} />

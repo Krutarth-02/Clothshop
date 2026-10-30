@@ -22,13 +22,14 @@ app.use(express.urlencoded({ extended: true }));
 const authRoute = require("./routes/auth.routes");
 const productRoute = require("./routes/product.routes");
 const userRoute = require("./routes/user.routes");
-const notificationRoute = require("./routes/notification.routes")
-
+const notificationRoute = require("./routes/notification.routes");
+const paymentRoute = require("./routes/payment.routes");
 
 app.use("/api/auth", authRoute);
 app.use("/api/products", productRoute);
 app.use("/api/user", userRoute);
 app.use("/api/notifications", notificationRoute);
+app.use("/api/payments", paymentRoute);
 app.use(errorHandler);
 
 const port = process.env.PORT || 3000;

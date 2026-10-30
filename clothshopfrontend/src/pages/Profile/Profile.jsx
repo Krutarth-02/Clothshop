@@ -1,12 +1,12 @@
 import LoadingState from "../../components/common/Loader";
 import FormActions from "../../components/common/FormActions";
-import UserAvatar from "../../components/common/UserAvatar";
+import AccountSidebar from "../../components/common/AccountSidebar";
+import OrderHistory from "./OrderHistory";
 import ErrorAlert from "../../components/common/ErrorAlert";
 import { useState } from "react";
 import { useFormik } from "formik";
 import {
   Anchor,
-  Badge,
   Box,
   Breadcrumbs,
   Button,
@@ -19,8 +19,8 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { Link } from "react-router-dom";
-import { LogOut, Save, ShoppingBag, Trash2 } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Package, Save, Trash2, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   useGetProfileQuery,
@@ -30,6 +30,17 @@ import DeleteAccountModal from "../../components/common/DeleteAccountModal";
 import useAccountActions from "../../hooks/useAccountActions";
 
 function ProfileContent({ user }) {
+  const [params, setParams] = useSearchParams();
+  const activeSection =
+    params.get("section") === "orders" ? "orders" : "account";
+  const selectSection = (section) => {
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      if (section === "account") next.delete("section");
+      else next.set("section", section);
+      return next;
+    });
+  };
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [error, setError] = useState("");
@@ -52,12 +63,14 @@ function ProfileContent({ user }) {
       setError("");
       try {
         const result = await updateProfile(values).unwrap();
-        form.resetForm({ values: {
-          fullName: result.data.fullName || "",
-          phone: result.data.phone || "",
-          city: result.data.city || "",
-          country: result.data.country || "",
-        } });
+        form.resetForm({
+          values: {
+            fullName: result.data.fullName || "",
+            phone: result.data.phone || "",
+            city: result.data.city || "",
+            country: result.data.country || "",
+          },
+        });
         toast.success("Profile updated");
       } catch (failure) {
         setError(
@@ -78,115 +91,104 @@ function ProfileContent({ user }) {
   return (
     <>
       <Grid gutter={{ base: 24, lg: 40 }}>
-        <Grid.Col span={{ base: 12, lg: 4 }}>
-          <Paper withBorder p="xl" radius="md">
-            <Stack align="flex-start" gap="lg">
-              <UserAvatar
-                user={user}
-                color="gray"
-                variant="light"
-                size={72}
-                radius="xl"
-              />
-              <Box style={{ minWidth: 0, overflowWrap: "anywhere" }}>
-                <Title order={2} size={24} fw={500}>
-                  {user.fullName}
-                </Title>
-                <Text size="sm" c="dimmed" mt={6}>
-                  {user.email}
-                </Text>
-              </Box>
-              <Badge variant="light" color="gray">
-                Customer account
-              </Badge>
-              <Button
-                component={Link}
-                to="/cart"
-                fullWidth
-                variant="default"
-                leftSection={<ShoppingBag size={17} />}
-              >
-                View shopping bag
-              </Button>
-              <Button
-                fullWidth
-                variant="subtle"
-                color="gray"
-                leftSection={<LogOut size={17} />}
-                loading={signingOut}
-                onClick={signOut}
-              >
-                Sign out
-              </Button>
-            </Stack>
-          </Paper>
+        <Grid.Col span={{ base: 12, md: 4, lg: 3 }}>
+          <AccountSidebar
+            user={user}
+            active={activeSection}
+            onSelect={selectSection}
+            onSignOut={signOut}
+            signingOut={signingOut}
+            items={[
+              {
+                value: "account",
+                label: "My Account",
+                icon: <UserRound size={18} />,
+              },
+              {
+                value: "orders",
+                label: "Order History",
+                icon: <Package size={18} />,
+              },
+            ]}
+          />
         </Grid.Col>
-        <Grid.Col span={{ base: 12, lg: 8 }}>
-          <Stack gap="xl">
-            <Paper withBorder radius="md" p={{ base: 20, sm: 32 }}>
-              <Title order={2} size={26} fw={500} mb="sm">
-                Personal details
-              </Title>
-              <Text size="sm" c="dimmed" mb="xl">
-                Keep your account details up to date.
-              </Text>
-              <form onSubmit={form.handleSubmit}>
-                <Stack gap="lg">
-                  <ErrorAlert message={error} />
-                  <TextInput
-                    label="Full name"
-                    autoComplete="name"
-                    required
-                    maxLength={200}
-                    size="md"
-                    {...field("fullName")}
-                  />
-                  <TextInput
-                    label="Email address"
-                    description="Your sign-in email."
-                    value={user.email}
-                    readOnly
-                    size="md"
-                  />
-                  <TextInput
-                    label="Phone number"
-                    autoComplete="tel"
-                    type="tel"
-                    maxLength={100}
-                    size="md"
-                    {...field("phone")}
-                  />
-                  <SimpleGrid cols={{ base: 1, sm: 2 }}>
+        <Grid.Col span={{ base: 12, md: 8, lg: 9 }}>
+          {activeSection === "orders" ? (
+            <OrderHistory />
+          ) : (
+            <Stack gap="xl">
+              <Paper withBorder radius="md" p={{ base: 20, sm: 32 }}>
+                <Title order={2} size={26} fw={500} mb="sm">
+                  Personal details
+                </Title>
+                <Text size="sm" c="dimmed" mb="xl">
+                  Keep your account details up to date.
+                </Text>
+                <form onSubmit={form.handleSubmit}>
+                  <Stack gap="lg">
+                    <ErrorAlert message={error} />
                     <TextInput
-                      label="City"
-                      autoComplete="address-level2"
-                      maxLength={100}
+                      label="Full name"
+                      autoComplete="name"
+                      required
+                      maxLength={200}
                       size="md"
-                      {...field("city")}
+                      {...field("fullName")}
                     />
                     <TextInput
-                      label="Country"
-                      autoComplete="country-name"
+                      label="Email address"
+                      description="Your sign-in email."
+                      value={user.email}
+                      readOnly
+                      size="md"
+                    />
+                    <TextInput
+                      label="Phone number"
+                      autoComplete="tel"
+                      type="tel"
                       maxLength={100}
                       size="md"
-                      {...field("country")}
+                      {...field("phone")}
                     />
-                  </SimpleGrid>
-                  <FormActions actions={[
-                    { label: "Save changes", type: "submit", color: "dark", leftSection: <Save size={17} />,
-                      loading: isLoading, disabled: !form.dirty },
-                  ]} />
-                </Stack>
-              </form>
-            </Paper>
-            <Paper withBorder radius="md" p={{ base: 20, sm: 32 }}>
-              <Title order={2} size={23} fw={500} mb="sm">
-                Account management
-              </Title>
-              <>
+                    <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                      <TextInput
+                        label="City"
+                        autoComplete="address-level2"
+                        maxLength={100}
+                        size="md"
+                        {...field("city")}
+                      />
+                      <TextInput
+                        label="Country"
+                        autoComplete="country-name"
+                        maxLength={100}
+                        size="md"
+                        {...field("country")}
+                      />
+                    </SimpleGrid>
+                    <FormActions
+                      actions={[
+                        {
+                          label: "Save changes",
+                          type: "submit",
+                          color: "dark",
+                          leftSection: <Save size={17} />,
+                          loading: isLoading,
+                          disabled: !form.dirty,
+                        },
+                      ]}
+                    />
+                  </Stack>
+                </form>
+              </Paper>
+              <Paper withBorder radius="md" p={{ base: 20, sm: 32 }}>
+                <Title order={2} size={23} fw={500} mb="sm">
+                  Account management
+                </Title>
+                <>
                   <Text size="sm" c="dimmed" lh={1.8} mb="lg">
-                    Permanently delete your account.
-                    Your password and a final confirmation are required.
+                    Permanently delete your account. Your password and a final
+                    confirmation are required.
                   </Text>
                   <Button
                     variant="outline"
@@ -196,9 +198,10 @@ function ProfileContent({ user }) {
                   >
                     Delete account
                   </Button>
-              </>
-            </Paper>
-          </Stack>
+                </>
+              </Paper>
+            </Stack>
+          )}
         </Grid.Col>
       </Grid>
       {deleteOpen && (
@@ -228,7 +231,7 @@ export default function Profile() {
         My profile
       </Title>
       {error ? (
-<ErrorAlert title="Unable to load profile" onRetry={refetch} />
+        <ErrorAlert title="Unable to load profile" onRetry={refetch} />
       ) : data?.data ? (
         <ProfileContent key={data.data._id} user={data.data} />
       ) : (
