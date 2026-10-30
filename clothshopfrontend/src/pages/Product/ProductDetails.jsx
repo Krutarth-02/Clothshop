@@ -1,4 +1,5 @@
 import ErrorAlert from "../../components/common/ErrorAlert";
+import WishlistButton from "../../components/common/WishlistButton";
 import { useState } from "react";
 import {
   Accordion,
@@ -27,11 +28,49 @@ import {
   createCartItem,
   setBuyNowItem,
 } from "../../redux/cart/cartSlice";
-import { useGetProductByIdQuery } from "../../redux/auth/productApi";
+import { useGetProductByIdQuery, useGetProductsQuery } from "../../redux/auth/productApi";
+import ProductGrid from "../../components/common/ProductGrid";
+import ProductPreview from "../../components/common/ProductPreview";
+import SizeGuide from "../../components/product/SizeGuide";
 import {
   productColor,
   productOptions,
 } from "../../components/product/productOptions";
+
+function SimilarProducts({ product }) {
+  const [preview, setPreview] = useState(null);
+  const category = typeof product.category === "string" ? product.category.trim().toLowerCase() : "";
+  const { data, isLoading, isFetching, isError, refetch } = useGetProductsQuery(undefined, { skip: !category });
+  const products = Array.isArray(data?.data) ? data.data : [];
+  const colours = productOptions(product.color).map((value) => value.toLowerCase());
+  const sizes = productOptions(product.size).map((value) => value.toLowerCase());
+  const score = (item) =>
+    (productOptions(item.color).some((value) => colours.includes(value.toLowerCase())) ? 2 : 0) +
+    (productOptions(item.size).some((value) => sizes.includes(value.toLowerCase())) ? 1 : 0);
+  const priceDistance = (item) => Number.isFinite(item.price) && Number.isFinite(product.price)
+    ? Math.abs(item.price - product.price) : Infinity;
+  const suggestions = products
+    .filter((item) => item?._id && item._id !== product._id && typeof item.category === "string" && item.category.trim().toLowerCase() === category)
+    .sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0) || score(b) - score(a) || priceDistance(a) - priceDistance(b) || String(a._id).localeCompare(String(b._id)))
+    .slice(0, 4);
+
+  if (!category) return null;
+
+  return <Box component="section" aria-labelledby="similar-products-title" mt={{ base: 48, md: 72 }} pt={{ base: 28, md: 40 }} style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}>
+    <Group justify="space-between" align="flex-end" mb={24}>
+      <Stack gap={8}>
+        <Title id="similar-products-title" order={2} size="clamp(26px, 3vw, 34px)" fw={500}>You may also like</Title>
+        <Text size="sm" c="dimmed">Similar finds from our {product.category} collection.</Text>
+      </Stack>
+      <Anchor component={Link} to={`/shop?category=${encodeURIComponent(product.category.trim())}`} size="sm" c="dimmed">View collection</Anchor>
+    </Group>
+    {isError ? <ErrorAlert title="Similar products couldn't load" message="Please try again to explore more from this collection." onRetry={refetch} />
+      : isLoading || (isFetching && !data) ? <ProductGrid loading placeholderCount={4} />
+      : suggestions.length ? <ProductGrid products={suggestions} onPreview={setPreview} cardProps={{ withBorder: true }} />
+      : <Text size="sm" c="dimmed">More similar styles will appear here when available.</Text>}
+    <ProductPreview product={preview} onClose={() => setPreview(null)} />
+  </Box>;
+}
 
 function ProductContent({ product }) {
   const dispatch = useDispatch(),
@@ -93,6 +132,7 @@ function ProductContent({ product }) {
             <Text c="dimmed" size="xs" mb="md" style={{ letterSpacing: 2 }}>
               {product.category || "THE COLLECTION"}
             </Text>
+            <Group justify="space-between" align="flex-start" wrap="nowrap">
             <Title
               order={1}
               fw={500}
@@ -102,6 +142,8 @@ function ProductContent({ product }) {
             >
               {product.name}
             </Title>
+            <WishlistButton product={product} style={{ flexShrink: 0 }} />
+            </Group>
             <Text size="xl" fw={500} mt="lg">
               {typeof product.price === "number"
                 ? `₹${product.price.toLocaleString("en-IN")}`
@@ -177,9 +219,12 @@ function ProductContent({ product }) {
             )}
           </Box>
           <Box>
-            <Text fw={500} size="sm" mb="md">
+            <Group justify="space-between" gap="sm" mb="md">
+            <Text fw={500} size="sm">
               Size {size && `— ${size}`}
             </Text>
+            <SizeGuide product={product} onSelect={setChosenSize} />
+            </Group>
             {sizes.length ? (
               <Group gap="xs" role="group" aria-label="Available product sizes">
                 {sizes.map((option) => (
@@ -391,7 +436,10 @@ export default function ProductDetails() {
           </Group>
         </ErrorAlert>
       ) : product ? (
-        <ProductContent key={id} product={product} />
+        <Box key={id}>
+          <ProductContent product={product} />
+          <SimilarProducts product={product} />
+        </Box>
       ) : null}
     </Container>
   );

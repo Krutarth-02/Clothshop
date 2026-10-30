@@ -17,6 +17,7 @@ import About from "./pages/About/About";
 import ProductDetails from "./pages/Product/ProductDetails";
 import Cart from "./pages/Cart/Cart";
 import Profile from "./pages/Profile/Profile";
+import Wishlist from "./pages/Wishlist/Wishlist";
 import GuidancePage from "./pages/Guidance/GuidancePage";
 import { guidancePages } from "./data/guidance";
 
@@ -75,6 +76,7 @@ function App() {
             ))}
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/checkout" element={<Cart checkout />} />
             <Route element={<PrivateRoute />}>
               <Route path="/home" element={<Home />} />

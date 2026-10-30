@@ -1,27 +1,15 @@
-import ErrorAlert from "../../components/common/ErrorAlert";
 import { useState } from "react";
-import {
-  Anchor,
-  Box,
-  Breadcrumbs,
-  Button,
-  Container,
-  Group,
-  Image,
-  Pagination,
-  Select,
-  SimpleGrid,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { Anchor, Badge, Box, Breadcrumbs, Button, Container, Grid, Group, Pagination, Paper, Select, Stack, Text, Title } from "@mantine/core";
 import { useReducedMotion } from "@mantine/hooks";
-import { ArrowRight, Search, X } from "lucide-react";
+import { ArrowRight, SlidersHorizontal, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useGetProductsQuery } from "../../redux/auth/productApi";
+import { productOptions } from "../../components/product/productOptions";
 import ProductGrid from "../../components/common/ProductGrid";
 import ProductPreview from "../../components/common/ProductPreview";
-import Reveal from "../../components/common/Reveal";
+import ProductFilters from "../../components/common/ProductFilters";
+import CommonDrawer from "../../components/common/CommonDrawer";
+import ErrorAlert from "../../components/common/ErrorAlert";
 
 const collectionDetails = {
   all: {
@@ -57,345 +45,131 @@ const collectionDetails = {
     aliases: ["accessories", "accessory"],
   },
 };
-const clothingCategories = [
-  {
-    label: "Women",
-    to: "/women",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    label: "Men",
-    to: "/men",
-    image:
-      "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    label: "Accessories",
-    to: "/accessories",
-    image:
-      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80",
-  },
-];
 
-const pageSize = 16;
+const pageSize = 12;
+const sizeOrder = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL", "4XL"];
+const distinct = (values) => [...new Map(values.filter(Boolean).map((value) => [value.toLowerCase(), value])).values()];
 
 export default function Shop({ collection = "all" }) {
-  const content = collectionDetails[collection];
+  const content = collectionDetails[collection] || collectionDetails.all;
   const [searchParams, setSearchParams] = useSearchParams();
   const [preview, setPreview] = useState(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const { data, isLoading, isError, error, refetch } = useGetProductsQuery();
   const products = Array.isArray(data?.data) ? data.data : [];
-  const category = searchParams.get("category") || "All";
-  const search = searchParams.get("q") || "";
-  const sort =
-    searchParams.get("sort") || (collection === "new" ? "newest" : "featured");
-  const categories = [
-    ...new Map(
-      products
-        .filter((product) => product.category?.trim())
-        .map((product) => [
-          product.category.trim().toLowerCase(),
-          product.category.trim(),
-        ]),
-    ).values(),
-  ].sort((a, b) => a.localeCompare(b));
-  const query = search.trim().toLowerCase();
-  const filteredProducts = products
-    .filter((product) => {
-      const productCategory = product.category?.trim().toLowerCase() || "";
-      const inCollection =
-        !content.aliases || content.aliases.includes(productCategory);
-      const inCategory =
-        category === "All" || productCategory === category.toLowerCase();
-      const matchesSearch =
-        !query ||
-        [product.name, product.description, product.category].some((value) =>
-          value?.toLowerCase().includes(query),
-        );
-      return inCollection && inCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      if (sort === "price-asc") return a.price - b.price;
-      if (sort === "price-desc") return b.price - a.price;
-      if (sort === "name") return a.name.localeCompare(b.name);
-      if (sort === "newest")
-        return (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0);
-      return 0;
-    });
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
-  const requestedPage = Number(searchParams.get("page")) || 1;
-  const page = Math.min(totalPages, Math.max(1, Math.floor(requestedPage)));
-  const visibleProducts = filteredProducts.slice(
-    (page - 1) * pageSize,
-    page * pageSize,
-  );
-  const needsLogin = error?.status === 401 || error?.status === 403;
-  const updateFilter = (key, value) => {
-    setSearchParams(
-      (previous) => {
-        const next = new URLSearchParams(previous);
-        if (!value || (key === "category" && value === "All")) next.delete(key);
-        else next.set(key, value);
-        if (key !== "page") next.delete("page");
-        return next;
-      },
-      { replace: key === "q", preventScrollReset: true },
-    );
+  const collectionProducts = products.filter((product) => !content.aliases || content.aliases.includes(product.category?.trim().toLowerCase()));
+  const options = {
+    categories: distinct(collectionProducts.map((product) => product.category?.trim())).sort((a, b) => a.localeCompare(b)),
+    sizes: distinct(collectionProducts.flatMap((product) => productOptions(product.size))).sort((a, b) => {
+      const first = sizeOrder.indexOf(a.toUpperCase()), second = sizeOrder.indexOf(b.toUpperCase());
+      if (first !== -1 || second !== -1) return (first === -1 ? 999 : first) - (second === -1 ? 999 : second);
+      return a.localeCompare(b, undefined, { numeric: true });
+    }),
+    colours: distinct(collectionProducts.flatMap((product) => productOptions(product.color))).sort((a, b) => a.localeCompare(b)),
   };
+  const priceLimit = Math.max(100, Math.ceil(collectionProducts.reduce((max, product) => Number.isFinite(product.price) ? Math.max(max, product.price) : max, collectionProducts.length ? 0 : 5000) / 100) * 100);
+  const rawPrice = searchParams.get("maxPrice");
+  const chosenPrice = rawPrice !== null && rawPrice !== "" ? Number(rawPrice) : priceLimit;
+  const values = {
+    q: searchParams.get("q") || "",
+    category: searchParams.get("category") === "All" ? "" : searchParams.get("category") || "",
+    size: searchParams.get("size") || "",
+    colour: searchParams.get("colour") || "",
+    maxPrice: Number.isFinite(chosenPrice) ? Math.min(priceLimit, Math.max(0, chosenPrice)) : priceLimit,
+    inStock: searchParams.get("inStock") === "true",
+  };
+  const sort = searchParams.get("sort") || (collection === "new" ? "newest" : "featured");
+  const query = values.q.trim().toLowerCase();
+  const filteredProducts = collectionProducts.filter((product) => {
+    const colours = productOptions(product.color), sizes = productOptions(product.size);
+    return (!values.category || product.category?.trim().toLowerCase() === values.category.toLowerCase()) &&
+      (!query || [product.name, product.description, product.category, ...colours, ...sizes].some((value) => typeof value === "string" && value.toLowerCase().includes(query))) &&
+      (!values.size || sizes.some((size) => size.toLowerCase() === values.size.toLowerCase())) &&
+      (!values.colour || colours.some((colour) => colour.toLowerCase() === values.colour.toLowerCase())) &&
+      Number.isFinite(product.price) && product.price >= 0 && product.price <= values.maxPrice &&
+      (!values.inStock || (Number.isInteger(product.stock) && product.stock > 0));
+  }).sort((a, b) => {
+    if (sort === "price-asc") return a.price - b.price;
+    if (sort === "price-desc") return b.price - a.price;
+    if (sort === "name") return (a.name || "").localeCompare(b.name || "");
+    if (sort === "newest") return (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0);
+    return 0;
+  });
+  const activeFilters = [
+    ...(query ? [{ key: "q", label: values.q }] : []),
+    ...["category", "size", "colour"].filter((key) => values[key]).map((key) => ({ key, label: values[key] })),
+    ...(values.maxPrice < priceLimit ? [{ key: "maxPrice", label: "Up to \u20b9" + values.maxPrice.toLocaleString("en-IN") }] : []),
+    ...(values.inStock ? [{ key: "inStock", label: "In stock" }] : []),
+  ];
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+  const requestedPage = Number(searchParams.get("page"));
+  const page = Number.isFinite(requestedPage) ? Math.min(totalPages, Math.max(1, Math.floor(requestedPage))) : 1;
+  const visibleProducts = filteredProducts.slice((page - 1) * pageSize, page * pageSize);
+  const updateFilter = (key, value) => setSearchParams((previous) => {
+    const next = new URLSearchParams(previous);
+    if (!value) next.delete(key); else next.set(key, value);
+    if (key !== "page") next.delete("page");
+    return next;
+  }, { replace: key === "q" || key === "maxPrice", preventScrollReset: true });
+  const clearFilters = () => setSearchParams((previous) => {
+    const next = new URLSearchParams(previous);
+    for (const key of ["q", "category", "size", "colour", "maxPrice", "inStock", "sort", "page"]) next.delete(key);
+    return next;
+  }, { preventScrollReset: true });
+  const filterProps = { values, options, priceLimit, disabled: isLoading || isError, onChange: updateFilter, onClear: clearFilters };
+  const needsLogin = error?.status === 401 || error?.status === 403;
 
   return (
-    <Box
-      component="main"
-      style={{ userSelect: "text", overflowWrap: "anywhere" }}
-    >
-      <Box bg="var(--mantine-color-default-hover)">
-        <Container
-          py={{ base: 32, md: 56 }}
-        >
-          <Breadcrumbs
-            separator="/"
-            styles={{ breadcrumb: { whiteSpace: "normal" } }}
-          >
-            <Anchor component={Link} to="/" size="sm" c="dimmed">
-              Home
-            </Anchor>
-            {collection !== "all" && (
-              <Anchor component={Link} to="/shop" size="sm" c="dimmed">
-                Shop
-              </Anchor>
-            )}
-            <Text size="sm">{content.label}</Text>
-          </Breadcrumbs>
-          <Reveal>
-            <Text size="xs" c="dimmed" mb="md" style={{ letterSpacing: 2 }}>
-              {content.label.toUpperCase()} / HIFASHOPNHUB
-            </Text>
-            <Title
-              order={1}
-              fw={500}
-              size="clamp(36px, 5vw, 64px)"
-              lh={1.1}
-              maw={800}
-              style={{ letterSpacing: "-.05em" }}
-            >
-              {content.title}
-            </Title>
-            <Text mt="lg" maw={580} c="dimmed" lh={1.8}>
-              {content.description}
-            </Text>
-          </Reveal>
-        </Container>
-      </Box>
-      <Container
-        py={{ base: 40, md: 60 }}
-      >
-        {collection === "all" && (
-          <Reveal component="section" aria-label="Shop by collection" mb={48}>
-            <Title order={2} size={26} fw={500} mb="xl">
-              Shop by collection
-            </Title>
-            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg">
-              {clothingCategories.map((card) => (
-                <Anchor
-                  key={card.to}
-                  component={Link}
-                  to={card.to}
-                  underline="never"
-                  c="var(--mantine-color-text)"
-                >
-                  <Box style={{ overflow: "hidden" }}>
-                    <Image
-                      src={card.image}
-                      alt={`${card.label} collection`}
-                      h={{ base: 220, sm: 190, lg: 250 }}
-                      loading="lazy"
-                    />
-                  </Box>
-                  <Group justify="space-between" mt="md" mih={44}>
-                    <Text fw={500}>{card.label}</Text>
-                    <ArrowRight size={18} />
-                  </Group>
-                </Anchor>
-              ))}
-            </SimpleGrid>
-          </Reveal>
-        )}
-        <Box
-          component="section"
-          id="catalog-results"
-          aria-label={`${content.label} products`}
-          style={{ scrollMarginTop: 110 }}
-        >
-          <Group justify="space-between" align="end" gap="lg" mb="xl">
-            <Box>
-              <Title order={2} size={28} fw={500}>
-                {collection === "all"
-                  ? "All clothing & accessories"
-                  : content.label}
-              </Title>
-              {!isLoading && !isError && (
-                <Text size="sm" c="dimmed" mt="xs" aria-live="polite">
-                  {filteredProducts.length}{" "}
-                  {filteredProducts.length === 1 ? "piece" : "pieces"}
-                </Text>
-              )}
-            </Box>
-            {collection !== "all" && (
-              <Anchor
-                component={Link}
-                to="/shop"
-                c="var(--mantine-color-text)"
-                size="sm"
-                style={{
-                  minHeight: 44,
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
-                Explore all collections <ArrowRight size={16} />
-              </Anchor>
-            )}
-          </Group>
-          {!isError && (
-            <>
-              <SimpleGrid cols={{ base: 1, sm: 2 }} mb="lg">
-                <TextInput
-                  label="Search this collection"
-                  placeholder="Search clothing, categories…"
-                  value={search}
-                  onChange={(event) =>
-                    updateFilter("q", event.currentTarget.value)
-                  }
-                  leftSection={<Search size={17} />}
-                  size="md"
-                  styles={{ input: { fontSize: 16 } }}
-                />
-                <Select
-                  label="Sort by"
-                  value={sort}
-                  onChange={(value) => updateFilter("sort", value)}
-                  allowDeselect={false}
-                  size="md"
-                  styles={{ input: { fontSize: 16 } }}
-                  data={[
-                    { value: "featured", label: "Featured" },
-                    { value: "newest", label: "Newest first" },
-                    { value: "price-asc", label: "Price: low to high" },
-                    { value: "price-desc", label: "Price: high to low" },
-                    { value: "name", label: "Name: A–Z" },
-                  ]}
-                />
-              </SimpleGrid>
-              {(collection === "all" || collection === "new") &&
-                categories.length > 0 && (
-                  <Group
-                    gap="xs"
-                    mb="xl"
-                    aria-label="Filter by clothing category"
-                  >
-                    {["All", ...categories].map((item) => (
-                      <Button
-                        key={item}
-                        variant={category === item ? "filled" : "default"}
-                        color="dark"
-                        radius={0}
-                        mih={44}
-                        aria-pressed={category === item}
-                        onClick={() => updateFilter("category", item)}
-                      >
-                        {item === "All" ? "All categories" : item}
-                      </Button>
-                    ))}
-                  </Group>
-                )}
-            </>
-          )}
-          {isLoading ? (
-            <ProductGrid loading placeholderCount={8} spacing="lg" />
-          ) : isError ? (
-            <ErrorAlert
-              color="gray"
-              title={
-                needsLogin
-                  ? "Your collection is a sign-in away."
-                  : "We couldn't load the collection."
-              }
-            >
-              <Text size="sm" mb="lg">
-                {needsLogin
-                  ? "Sign in to browse products and explore the available clothing categories."
-                  : "Please try again to load the latest pieces."}
-              </Text>
-              <Group>
-                {needsLogin && (
-                  <Button component={Link} to="/login" color="dark" radius={0}>
-                    Sign in
-                  </Button>
-                )}
-                <Button variant="default" onClick={refetch}>
-                  Try again
-                </Button>
-              </Group>
-            </ErrorAlert>
-          ) : visibleProducts.length ? (
-            <>
-              <ProductGrid
-                products={visibleProducts}
-                onPreview={setPreview}
-                verticalSpacing={32}
-              />
-              {totalPages > 1 && (
-                <Group justify="center" mt={40}>
-                  <Pagination
-                    total={totalPages}
-                    value={page}
-                    siblings={0}
-                    color="dark"
-                    onChange={(value) => {
-                      updateFilter("page", String(value));
-                      document
-                        .getElementById("catalog-results")
-                        ?.scrollIntoView({
-                          behavior: reducedMotion ? "instant" : "smooth",
-                        });
-                    }}
-                  />
-                </Group>
-              )}
-            </>
-          ) : (
-            <Box
-              ta="center"
-              p={{ base: 24, md: 48 }}
-              bg="var(--mantine-color-default-hover)"
-            >
-              <Title order={3} fw={500}>
-                {search || category !== "All"
-                  ? "No pieces match these filters."
-                  : "This collection is taking shape."}
-              </Title>
-              <Text c="dimmed" size="sm" mt="md">
-                {search || category !== "All"
-                  ? "Try another search or explore all available pieces."
-                  : "Products will appear here as they are added to the collection."}
-              </Text>
-              {(search || category !== "All") && (
-                <Button
-                  mt="xl"
-                  variant="default"
-                  leftSection={<X size={16} />}
-                  onClick={() => setSearchParams({})}
-                >
-                  Clear filters
-                </Button>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Container>
+    <Container component="main" py={{ base: 24, md: 36 }} mih="65vh" style={{ userSelect: "text", overflowWrap: "anywhere" }}>
+      <Breadcrumbs mb={24} separator="/"><Anchor component={Link} to="/" size="sm" c="dimmed">Home</Anchor>{collection !== "all" && <Anchor component={Link} to="/shop" size="sm" c="dimmed">Shop</Anchor>}<Text size="sm">{content.label}</Text></Breadcrumbs>
+      <Grid gutter={{ base: 24, lg: 28 }} align="flex-start">
+        <Grid.Col span={{ md: 4, lg: 3 }} visibleFrom="md">
+          <Paper component="aside" withBorder radius="md" p="lg" bg="var(--mantine-color-default-hover)" aria-label="Product filters">
+            <ProductFilters {...filterProps} />
+          </Paper>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 8, lg: 9 }}>
+          <Box component="section" id="catalog-results" aria-label={content.label + " products"} style={{ scrollMarginTop: 110 }}>
+            <Title order={1} fw={600} size="clamp(28px, 3.5vw, 40px)" mb={8} style={{ letterSpacing: "-.035em" }}>{content.label}</Title>
+            <Text size="sm" c="dimmed" lh={1.7} mb="lg">{content.description}</Text>
+            <Group justify="space-between" align="flex-end" mb="lg" gap="md">
+              <Stack gap={10}>
+                <Text size="sm" c="dimmed" aria-live="polite">{isLoading ? "Loading products..." : isError ? "Products could not load" : filteredProducts.length + (filteredProducts.length === 1 ? " result" : " results")}</Text>
+                <Button hiddenFrom="md" variant="default" leftSection={<SlidersHorizontal size={16} />} onClick={() => setFiltersOpen(true)}>Filters{activeFilters.length ? " (" + activeFilters.length + ")" : ""}</Button>
+              </Stack>
+              <Select label="Sort by" aria-label="Sort products" value={sort} onChange={(value) => updateFilter("sort", value)} allowDeselect={false} w={{ base: 180, sm: 210 }}
+                data={[{ value: "featured", label: "Featured" }, { value: "newest", label: "Newest first" }, { value: "price-asc", label: "Price: low to high" }, { value: "price-desc", label: "Price: high to low" }, { value: "name", label: "Name: A to Z" }]} />
+            </Group>
+            {activeFilters.length > 0 && <Group gap={8} mb="lg">{activeFilters.map((filter) => <Badge key={filter.key} variant="light" color="gray" size="lg" tt="none" style={{ height: "auto", paddingBlock: 5 }}>
+              <Group component="span" gap={6} wrap="nowrap">{filter.label}<Button variant="transparent" color="gray" size="compact-xs" p={0} aria-label={"Remove " + filter.label + " filter"} onClick={() => updateFilter(filter.key, "")}><X size={13} /></Button></Group>
+            </Badge>)}</Group>}
+            {isLoading ? <ProductGrid loading placeholderCount={6} cols={{ base: 1, xs: 2, lg: 3 }} /> : isError ? (
+              <ErrorAlert color="gray" title={needsLogin ? "Sign in to browse the collection" : "We couldn't load the collection"} onRetry={refetch} retryLabel="Try again">
+                <Text size="sm">{needsLogin ? "Sign in to check the current products and availability." : "Please try again to load the latest pieces."}</Text>
+                {needsLogin && <Button component={Link} to="/login" color="dark" mt="md">Sign in</Button>}
+              </ErrorAlert>
+            ) : visibleProducts.length ? (
+              <><ProductGrid products={visibleProducts} onPreview={setPreview} cols={{ base: 1, xs: 2, lg: 3 }} spacing="lg" verticalSpacing={24} cardProps={{ withBorder: true }} />
+                {totalPages > 1 && <Group justify="center" mt={32}><Pagination total={totalPages} value={page} siblings={0} color="dark" onChange={(value) => {
+                  updateFilter("page", String(value));
+                  document.getElementById("catalog-results")?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+                }} /></Group>}
+              </>
+            ) : <Paper withBorder radius="md" ta="center" p={{ base: 24, md: 48 }}>
+              <Title order={2} size={24} fw={500}>{activeFilters.length ? "No products match your filters." : "This collection is taking shape."}</Title>
+              <Text size="sm" c="dimmed" mt="sm">{activeFilters.length ? "Try another size, colour or price range, or clear all filters." : "Products will appear here as they are added to this collection."}</Text>
+              {activeFilters.length > 0 && <Button variant="default" mt="lg" onClick={clearFilters}>Clear all filters</Button>}
+            </Paper>}
+            <Group gap="lg" mt={28}>{[{ to: "/shop", label: "All clothing" }, { to: "/women", label: "Women" }, { to: "/men", label: "Men" }, { to: "/accessories", label: "Accessories" }].map((link) => <Anchor key={link.to} component={Link} to={link.to} size="xs" c="dimmed">{link.label} <ArrowRight size={12} /></Anchor>)}</Group>
+          </Box>
+        </Grid.Col>
+      </Grid>
+      <CommonDrawer open={filtersOpen} handleClose={() => setFiltersOpen(false)} title="Filter products" position="left" width="min(22rem, 100vw)">
+        <ProductFilters {...filterProps} />
+        <Button fullWidth mt="xl" color="dark" onClick={() => setFiltersOpen(false)}>Show {filteredProducts.length} results</Button>
+      </CommonDrawer>
       <ProductPreview product={preview} onClose={() => setPreview(null)} />
-    </Box>
+    </Container>
   );
 }

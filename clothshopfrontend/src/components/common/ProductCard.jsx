@@ -1,14 +1,16 @@
+import WishlistButton from "./WishlistButton";
 import { useState } from "react";
 import { Box, Group, Image, Stack, Text, UnstyledButton } from "@mantine/core";
 import { useReducedMotion } from "@mantine/hooks";
 import { ArrowUpRight } from "lucide-react";
 
-export default function ProductCard({ product, onPreview }) {
+export default function ProductCard({ product, onPreview, withBorder = false }) {
   const [hovered, setHovered] = useState(false);
   const reducedMotion = useReducedMotion();
   return (
-    <UnstyledButton
-      onClick={() => onPreview(product)}
+    <Box
+      component="article"
+      pos="relative"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
@@ -21,9 +23,11 @@ export default function ProductCard({ product, onPreview }) {
         flexDirection: "column",
         height: "100%",
         textAlign: "left",
+        ...(withBorder ? { border: "1px solid var(--mantine-color-default-border)", borderRadius: 12, overflow: "hidden", background: "var(--mantine-color-body)" } : {}),
       }}
-      aria-label={`Preview ${product.name}`}
     >
+      <UnstyledButton onClick={() => onPreview?.(product)} aria-label={`Preview ${product.name}`} w="100%"
+        style={{ display: "flex", flexDirection: "column", height: "100%", textAlign: "left" }}>
       <Box
         bg="var(--mantine-color-default-hover)"
         pos="relative"
@@ -58,7 +62,7 @@ export default function ProductCard({ product, onPreview }) {
           Quick look <ArrowUpRight size={12} aria-hidden="true" />
         </Text>
       </Box>
-      <Stack gap={5} mt="md" w="100%">
+      <Stack gap={5} mt="md" w="100%" px={withBorder ? 14 : 0} pb={withBorder ? 14 : 0}>
         <Text size="xs" c="dimmed" lineClamp={1}>
           {product.category || "The collection"}
         </Text>
@@ -79,6 +83,9 @@ export default function ProductCard({ product, onPreview }) {
           </Text>
         </Group>
       </Stack>
-    </UnstyledButton>
+      </UnstyledButton>
+      <WishlistButton product={product} style={{ position: "absolute", top: 12, right: 12, zIndex: 2 }} />
+      {product.unavailable && <Text pos="absolute" top={12} left={12} size="xs" bg="var(--mantine-color-body)" px="sm" py={6}>Unavailable</Text>}
+    </Box>
   );
 }

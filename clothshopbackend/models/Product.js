@@ -21,6 +21,13 @@ const ProductSchema = new mongoose.Schema({
     size: {
         type: [String],
     },
+    sizeChart: {
+        type: [new mongoose.Schema({
+            size: { type: String, required: true, trim: true },
+            chestCm: { type: Number, required: true, min: 1 }
+        }, { _id: false })],
+        default: undefined
+    },
     category: {
         type: String,
     },

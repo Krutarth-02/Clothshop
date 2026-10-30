@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../../redux/auth/authApi";
 import { useGetNotificationsQuery } from "../../redux/notifications/notificationApi";
 import { selectCartCount } from "../../redux/cart/cartSlice";
+import { selectWishlistCount } from "../../redux/wishlist/wishlistSlice";
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -27,6 +28,7 @@ import {
   ChevronDown,
   Moon,
   Gift,
+  Heart,
   LogOut,
   Trash2,
   ShoppingBag,
@@ -36,6 +38,7 @@ import {
 } from "lucide-react";
 import BrandLogo from "../common/BrandLogo";
 import NotificationDrawer from "./NotificationDrawer";
+import ProductSearch from "./ProductSearch";
 import DeleteAccountModal from "../common/DeleteAccountModal";
 import useAccountActions from "../../hooks/useAccountActions";
 
@@ -94,6 +97,7 @@ const accountLinks = [
 
 export default function Navbar({ colorScheme, toggleColorScheme }) {
   const cartCount = useSelector(selectCartCount);
+  const wishlistCount = useSelector(selectWishlistCount);
   const signedIn = Boolean(localStorage.getItem("userId"));
   const {
     data: profile,
@@ -115,12 +119,14 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
   const { pathname } = useLocation();
   const theme = useMantineTheme();
   const desktop = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`);
+  const actionSize = desktop ? 36 : 44;
   const { gutter = { base: 16, sm: 24, lg: 40 } } = theme.other || {};
 
   const accountItems = user
     ? [
         { label: "My profile", to: "/profile", icon: <User size={17} /> },
         { label: "Shopping bag", to: "/cart", icon: <ShoppingBag size={17} /> },
+        { label: "Wishlist", to: "/wishlist", icon: <Heart size={17} /> },
         {
           label: "Notifications",
           icon: <Gift size={17} />,
@@ -175,9 +181,10 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
           wrap="nowrap"
           gap={12}
           px={gutter}
-          maw={theme.other.contentWidth}
+          maw={1600}
           mx="auto"
           mih={{ base: 72, lg: 85 }}
+          style={{ display: "grid", gridTemplateColumns: desktop ? "minmax(0, 1fr) auto minmax(0, 1fr)" : "auto minmax(0, 1fr)", alignItems: "center" }}
         >
           <Anchor
             component={Link}
@@ -190,11 +197,13 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               minHeight: 44,
               display: "inline-flex",
               alignItems: "center",
+              justifySelf: "start",
             }}
           >
-            <BrandLogo />
+            <Box visibleFrom="sm"><BrandLogo /></Box>
+            <Box hiddenFrom="sm" component="img" src={import.meta.env.BASE_URL + "brand-mark.svg"} alt="" w={34} h={34} />
           </Anchor>
-          <Group gap={16} visibleFrom="xl" wrap="nowrap">
+          <Group gap={16} visibleFrom="xl" wrap="nowrap" justify="center" align="center">
             {shopLinks.map((link) => (
               <Anchor
                 key={link.label}
@@ -205,17 +214,20 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
                 size="13px"
                 c="var(--mantine-color-text)"
                 underline="hover"
-                style={{ whiteSpace: "nowrap" }}
+                style={{ whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", minHeight: 44 }}
               >
                 {link.label}
               </Anchor>
             ))}
           </Group>
           <Group
-            gap={{ base: 4, sm: 8 }}
+            gap={{ base: 4, sm: 8, xl: 4 }}
             wrap="nowrap"
-            style={{ flexShrink: 0 }}
+            justify="flex-end"
+            align="center"
+            style={{ minWidth: 0, justifySelf: "end" }}
           >
+            <ProductSearch key={pathname} iconSize={actionSize} onOpen={() => { setMenuOpen(false); setNotificationsOpen(false); }} />
             <Indicator
               disabled={!unreadCount}
               size={8}
@@ -225,7 +237,7 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               <ActionIcon
                 variant="subtle"
                 color="gray"
-                size={44}
+                size={actionSize}
                 aria-label={
                   unreadCount
                     ? `Notifications, ${unreadCount} unread`
@@ -242,6 +254,15 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               </ActionIcon>
             </Indicator>
             <Indicator
+              label={wishlistCount > 99 ? "99+" : wishlistCount}
+              disabled={!wishlistCount} size={18} color="red" offset={5}
+            >
+              <ActionIcon component={Link} to="/wishlist" variant="subtle" color="gray" size={actionSize}
+                aria-label={`Wishlist, ${wishlistCount} saved products`}>
+                <Heart size={20} fill={wishlistCount ? "var(--mantine-color-red-6)" : "none"} color={wishlistCount ? "var(--mantine-color-red-6)" : "currentColor"} />
+              </ActionIcon>
+            </Indicator>
+            <Indicator
               label={cartCount > 99 ? "99+" : cartCount}
               disabled={!cartCount}
               size={18}
@@ -253,7 +274,7 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
                 to="/cart"
                 variant="subtle"
                 color="gray"
-                size={44}
+                size={actionSize}
                 aria-label={`Shopping cart, ${cartCount} items`}
               >
                 <ShoppingBag size={20} />
@@ -263,7 +284,7 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               visibleFrom="xs"
               variant="subtle"
               color="gray"
-              size={44}
+              size={actionSize}
               aria-label={`Switch to ${colorScheme === "dark" ? "light" : "dark"} theme`}
               onClick={toggleColorScheme}
             >

@@ -8,6 +8,7 @@ export default function ProductGrid({
   placeholderCount = 4,
   onPreview,
   animate = false,
+  cardProps,
   ...props
 }) {
   const Root = animate ? ScrollReveal : SimpleGrid;
@@ -34,6 +35,7 @@ export default function ProductGrid({
               key={product._id}
               product={product}
               onPreview={onPreview}
+              {...cardProps}
             />
           ))}
     </Root>
