@@ -1,4 +1,5 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const {
   SignupUser,
   LoginUser,
@@ -7,8 +8,9 @@ const {
 const { apiLimiter } = require("../middlewares/rateLimiter.middleware");
 const authMiddleware = require("../middlewares/auth.middleware");
 // Register route
-router.post("/login", apiLimiter, LoginUser);
-router.post("/register", apiLimiter, SignupUser);
-router.post("/logout", authMiddleware, LogoutUser);
+router
+  .post("/login", apiLimiter, LoginUser)
+  .post("/register", apiLimiter, SignupUser)
+  .post("/logout", authMiddleware, LogoutUser);
 
 module.exports = router;

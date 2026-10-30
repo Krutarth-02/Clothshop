@@ -1,4 +1,5 @@
-﻿const router = require("express").Router();
+﻿const express = require("express");
+const router = express.Router();
 const {
   getUserProfile,
   deleteAccount,
@@ -9,12 +10,10 @@ const {
 } = require("../controllers/user.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const { apiLimiter } = require("../middlewares/rateLimiter.middleware");
-const rateLimit = require("express-rate-limit");
-const recoveryLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 20,
-  message: { message: "Too many recovery attempts. Please try again later." },
-});
+const {
+  recoveryLimiter,
+} = require("../middlewares/recoveryLimiter.middleware");
+
 // Get user profile
 router
   .get("/profile", authMiddleware, getUserProfile)

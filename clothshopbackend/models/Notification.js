@@ -11,5 +11,4 @@ const NotificationSchema = new mongoose.Schema(
 );
 
 NotificationSchema.index({ user: 1, sourceKey: 1 }, { unique: true });
-NotificationSchema.index({ user: 1, dismissedAt: 1, createdAt: -1 });
 module.exports = mongoose.model("Notification", NotificationSchema);
