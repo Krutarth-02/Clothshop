@@ -51,8 +51,8 @@ const Register = () => {
 
   return (
     <AuthLayout
-      title="Make yourself at home."
-      description="A fresh perspective on your everyday wardrobe. Join HIFASHOPNHUB."
+      title="Create your account."
+      description="Join HIFASHOPNHUB to manage your profile and view your purchase information in one place."
     >
       <form onSubmit={formik.handleSubmit}>
         <Stack gap={20}>

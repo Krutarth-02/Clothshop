@@ -3,10 +3,15 @@ import { handleGetProductById } from "./product.dispacher";
 
 export const productApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    searchProducts: builder.query({
+    searchProducts: builder.infiniteQuery({
       providesTags: ["Products"],
-      query: (keyword) => ({
-        url: `/products/search?keyword=${keyword}`,
+      infiniteQueryOptions: {
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.page + 1 : undefined,
+      },
+      query: ({ queryArg: keyword, pageParam }) => ({
+        url: "/products/search",
+        params: { keyword, page: pageParam },
         method: "GET",
       }),
     }),
@@ -32,6 +37,6 @@ export const productApi = api.injectEndpoints({
 
 export const {
   useGetProductsQuery,
-  useSearchProductsQuery,
+  useSearchProductsInfiniteQuery,
   useGetProductByIdQuery,
 } = productApi;

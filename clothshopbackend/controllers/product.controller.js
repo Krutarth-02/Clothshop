@@ -22,32 +22,25 @@ const getProductById = async (req, res,next) => {
     }
 }
 
-const searchProducts = async (req, res) => {
+const searchProducts = async (req, res, next) => {
   try {
-    const { keyword } = req.query;
-
-    if (!keyword) {
-      return res.status(400).json({ message: "Search keyword required" });
+    const keyword = typeof req.query.keyword === "string" ? req.query.keyword.trim() : "";
+    if (!keyword || keyword.length > 120) {
+      return res.status(400).json({ message: "Enter a product name between 1 and 120 characters." });
     }
-
-    // 🔍 Search logic
-    const products = await Product.find({
-      $or: [
-        { name: { $regex: keyword, $options: "i" } },
-        { category: { $regex: keyword, $options: "i" } },
-        { brand: { $regex: keyword, $options: "i" } },
-      ],
-    });
-
-    res.status(200).json({
-      success: true,
-      count: products.length,
-      data: products,
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    const page = Number(req.query.page || 1);
+    const limit = 5;
+    if (!Number.isSafeInteger(page) || page < 1 || page > 100000) {
+      return res.status(400).json({ message: "Invalid search page." });
+    }
+    const words = keyword.split(/\s+/).map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const filter = { $and: words.map((word) => ({ name: { $regex: word, $options: "i" } })) };
+    const [products, total] = await Promise.all([
+      Product.find(filter).sort({ name: 1, _id: 1 }).skip((page - 1) * limit).limit(limit).lean(),
+      Product.countDocuments(filter),
+    ]);
+    return res.status(200).json({ success: true, count: products.length, total, page, limit, hasMore: page * limit < total, data: products });
+  } catch (error) { next(error); }
 };
 
 module.exports = {

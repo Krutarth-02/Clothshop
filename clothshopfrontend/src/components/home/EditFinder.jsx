@@ -40,7 +40,7 @@ export default function EditFinder({ collections }) {
           <Grid.Col span={{ base: 12, md: 7 }}>
             <Stack gap="lg">
               <Text size="xs" style={{ letterSpacing: 2 }}>
-                A LITTLE MORE PERSONAL
+                SHOP YOUR WAY
               </Text>
               <Title
                 order={2}
@@ -49,11 +49,11 @@ export default function EditFinder({ collections }) {
                 lh={1.1}
                 style={{ letterSpacing: "-.04em" }}
               >
-                Build your own edit.
+                Find your next outfit.
               </Title>
               <Text size="sm" lh={1.8} maw={450}>
-                Choose a collection and how you'd like to explore it. Your next
-                perspective starts here.
+                Start with a collection, then browse the newest styles or sort
+                by price. Refine your results by size and colour as you go.
               </Text>
               <Box>
                 <Text size="sm" fw={500} mb="sm">
@@ -115,7 +115,7 @@ export default function EditFinder({ collections }) {
                   label: { whiteSpace: "normal" },
                 }}
               >
-                Explore my edit
+                Shop this collection
               </Button>
             </Stack>
           </Grid.Col>

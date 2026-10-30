@@ -12,7 +12,7 @@ export default function Footer() {
       <Container>
         <Group justify="space-between" align="center" gap="lg" mb={28}>
           <Anchor component={Link} to="/" c="inherit" underline="never" aria-label="HIFASHOPNHUB home"><BrandLogo /></Anchor>
-          <Text size="sm" c="#b9c1b8" maw={380} lh={1.7}>Good style starts with a little guidance. Find your fit, explore the store and shop with more confidence.</Text>
+          <Text size="sm" c="#b9c1b8" maw={380} lh={1.7}>Clothing and accessories for your everyday style. Explore the collection, find your fit and save your favourites.</Text>
         </Group>
         <Divider color="#354137" mb={28} />
         <Grid gutter={{ base: 24, md: 28 }}>
@@ -25,9 +25,9 @@ export default function Footer() {
           <Grid.Col span={{ base: 12, lg: 4 }}>
             <Box p={{ base: 20, lg: 24 }} style={{ background: "#222d25", border: "1px solid #3b493d", borderRadius: 12 }}>
               <Group gap={8} mb="md"><CircleHelp size={18} color="#d7c698" /><Text size="xs" fw={600} c="#d7c698" style={{ letterSpacing: 1.3 }}>NEW HERE? START HERE.</Text></Group>
-              <Title order={3} size={23} fw={500} c="#f5f3ea" mb={10}>A simpler way to shop.</Title>
-              <Text size="sm" c="#c2cbbf" lh={1.8} mb="lg">Learn how to search for products, pick a size, review your bag and manage your account. Our Help Centre brings the essentials together.</Text>
-              <Button component={Link} to="/how-to-shop" fullWidth color="gray" variant="white" radius="sm" rightSection={<ArrowRight size={16} />}>How to use HIFASHOPNHUB</Button>
+              <Title order={3} size={23} fw={500} c="#f5f3ea" mb={10}>Need a little guidance?</Title>
+              <Text size="sm" c="#c2cbbf" lh={1.8} mb="lg">Find answers about sizes, your shopping bag and your account. Our shopping guide helps you make the most of HIFASHOPNHUB.</Text>
+              <Button component={Link} to="/how-to-shop" fullWidth color="gray" variant="white" radius="sm" rightSection={<ArrowRight size={16} />}>Explore the shopping guide</Button>
               {supportEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportEmail) && <Anchor href={"mailto:" + supportEmail} c="#d7c698" size="sm" mt="md" display="block">{supportEmail}</Anchor>}
             </Box>
           </Grid.Col>

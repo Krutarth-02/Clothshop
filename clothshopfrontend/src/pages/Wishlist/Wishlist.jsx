@@ -19,7 +19,7 @@ export default function Wishlist() {
   return <Container component="main" py={{ base: 28, md: 48 }} mih="65vh" style={{ overflowWrap: "anywhere" }}>
     <Breadcrumbs><Anchor component={Link} to="/" size="sm" c="dimmed">Home</Anchor><Text size="sm">Wishlist</Text></Breadcrumbs>
     <Group justify="space-between" align="flex-start" mb={32}>
-      <Stack gap={8}><Text size="xs" c="dimmed" style={{ letterSpacing: 2 }}>YOUR SAVED FINDS</Text><Title order={1} fw={500} size="clamp(30px, 4vw, 44px)">My wishlist</Title><Text size="sm" c="dimmed">{items.length} saved {items.length === 1 ? "product" : "products"}. Kept on this browser for your next visit.</Text></Stack>
+      <Text size="sm" c="dimmed">{items.length} saved {items.length === 1 ? "product" : "products"}. Kept on this browser for your next visit.</Text>
       {items.length > 0 && <Button variant="subtle" color="gray" leftSection={<Trash2 size={16} />} onClick={() => dispatch(clearWishlist())}>Clear wishlist</Button>}
     </Group>
     {!items.length ? <Paper withBorder radius="md" p={{ base: 28, md: 56 }}><Stack align="center" ta="center" gap="lg">

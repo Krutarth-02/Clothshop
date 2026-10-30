@@ -58,7 +58,7 @@ const ResetPassword = () => {
 
   return (
     <AuthLayout
-      title="Back to a good place."
+      title="Set a new password."
       description="Choose a new password to finish recovering your HIFASHOPNHUB account."
     >
       <form

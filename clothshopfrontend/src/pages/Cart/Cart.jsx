@@ -140,18 +140,7 @@ export default function Cart({ checkout = false }) {
       </Breadcrumbs>
       <Group justify="space-between" mb={32} gap="md">
         <Box>
-          <Text size="xs" c="dimmed" mb="sm" style={{ letterSpacing: 2 }}>
-            {checkout ? "ONE MORE LOOK" : "YOUR HIFASHOPNHUB"}
-          </Text>
-          <Title
-            order={1}
-            fw={500}
-            size="clamp(32px, 4vw, 48px)"
-            style={{ letterSpacing: "-.04em" }}
-          >
-            {checkout ? "Review your selection." : "Your shopping bag."}
-          </Title>
-          <Text size="sm" c="dimmed" mt="md">
+          <Text size="sm" c="dimmed">
             {quantity} {quantity === 1 ? "item" : "items"}
             {buyNow
               ? " in your Buy Now selection. Your cart is unchanged."
@@ -221,8 +210,9 @@ export default function Cart({ checkout = false }) {
           {checkout && (
             <Alert color="gray" title="Checkout review" mb="xl">
               <Text size="sm">
-                Review your items below. Ordering and payment are not connected
-                yet, so this page does not place an order or take payment.
+                Check your sizes, colours and quantities below. Orders and
+                payments are currently unavailable. Your selection is saved
+                without placing an order.
               </Text>
             </Alert>
           )}
@@ -399,8 +389,8 @@ export default function Cart({ checkout = false }) {
                   </Text>
                 </Group>
                 <Text c="dimmed" size="xs" lh={1.7}>
-                  Delivery charges and taxes will be confirmed when ordering is
-                  connected. No stock is reserved by adding to cart.
+                  Product subtotal only. Checkout is currently available for
+                  review. Items in your bag are not reserved.
                 </Text>
                 <Divider my="xl" />
                 {isFetching ? (
@@ -409,13 +399,12 @@ export default function Cart({ checkout = false }) {
                   </Badge>
                 ) : checked && !issues ? (
                   <Text c="dimmed" size="xs" mb="md">
-                    Prices and availability checked against the current
-                    catalogue.
+                    Prices and availability are up to date.
                   </Text>
                 ) : null}
                 {checkout ? (
                   <Button disabled fullWidth radius={0} size="md">
-                    Ordering not connected yet
+                    Ordering currently unavailable
                   </Button>
                 ) : (
                   <Button

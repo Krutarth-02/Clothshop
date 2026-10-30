@@ -54,7 +54,7 @@ function ContactActions() {
       {[
         {
           title: "My Account",
-          description: "Update your profile or check saved payment records.",
+          description: "Manage your profile and view purchase and payment information.",
           to: "/profile",
           icon: UserRound,
         },

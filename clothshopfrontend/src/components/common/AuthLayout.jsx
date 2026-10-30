@@ -76,11 +76,11 @@ export default function AuthLayout({ title, description, children, compact = fal
                 Great company.
               </Title>
               <Text mt="xl" maw={350} c="#e8e5dd" lh={1.8}>
-                A little inspiration. A fresh perspective. A wardrobe that feels
-                like you.
+                Explore clothing and accessories, save your favourites and
+                find a look that feels like you.
               </Text>
               <Group mt={45} gap="xs">
-                <Text size="sm">Your next chapter starts here</Text>
+                <Text size="sm">Discover your next favourite</Text>
                 <ArrowUpRight size={18} />
               </Group>
             </Reveal>
@@ -123,7 +123,7 @@ export default function AuthLayout({ title, description, children, compact = fal
               style={{ minWidth: 0 }}
             >
               <Text size="xs" c="dimmed" mb={compact ? 8 : "lg"} style={{ letterSpacing: 2 }}>
-                WELCOME TO YOUR HIFASHOPNHUB
+                WELCOME TO HIFASHOPNHUB
               </Text>
               <Title
                 order={1}

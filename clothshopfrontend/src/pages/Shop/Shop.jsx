@@ -10,19 +10,20 @@ import ProductPreview from "../../components/common/ProductPreview";
 import ProductFilters from "../../components/common/ProductFilters";
 import CommonDrawer from "../../components/common/CommonDrawer";
 import ErrorAlert from "../../components/common/ErrorAlert";
+import { filterRikProducts } from "../../components/assistant/rikCommands";
 
 const collectionDetails = {
   all: {
-    title: "Find your everyday favourites.",
+    title: "Shop clothing & accessories",
     label: "Shop All",
     description:
-      "Explore every category, discover a fresh perspective, and find the pieces that feel like you.",
+      "Browse clothing and accessories. Filter by size, colour and price to find your next favourite.",
   },
   new: {
-    title: "A fresh point of view.",
+    title: "Discover new arrivals",
     label: "New Arrivals",
     description:
-      "Discover the latest additions to HIFASHOPNHUB, with the newest pieces first.",
+      "Explore the latest additions to the collection, with the newest styles first.",
   },
   women: {
     title: "Your style. Your way.",
@@ -35,7 +36,7 @@ const collectionDetails = {
     title: "Make the everyday yours.",
     label: "Men",
     description:
-      "Discover the men's collection and bring a fresh perspective to your wardrobe.",
+      "Explore men's clothing and find everyday favourites in your size and colour.",
     aliases: ["men", "mens", "men's"],
   },
   accessories: {
@@ -77,14 +78,17 @@ export default function Shop({ collection = "all" }) {
     size: searchParams.get("size") || "",
     colour: searchParams.get("colour") || "",
     maxPrice: Number.isFinite(chosenPrice) ? Math.min(priceLimit, Math.max(0, chosenPrice)) : priceLimit,
+    minPrice: Math.max(0, Number(searchParams.get("minPrice")) || 0),
     inStock: searchParams.get("inStock") === "true",
   };
   const sort = searchParams.get("sort") || (collection === "new" ? "newest" : "featured");
   const query = values.q.trim().toLowerCase();
-  const filteredProducts = collectionProducts.filter((product) => {
+  const rikIds = searchParams.get("rikIds")?.split(",").filter((id) => /^[a-f\d]{24}$/i.test(id)) || [];
+  const filteredProducts = filterRikProducts(collectionProducts, { q: query, size: values.size, minPrice: values.minPrice, maxPrice: values.maxPrice, inStock: values.inStock }).filter((product) => {
     const colours = productOptions(product.color), sizes = productOptions(product.size);
     return (!values.category || product.category?.trim().toLowerCase() === values.category.toLowerCase()) &&
-      (!query || [product.name, product.description, product.category, ...colours, ...sizes].some((value) => typeof value === "string" && value.toLowerCase().includes(query))) &&
+      (!searchParams.has("rikIds") || rikIds.includes(product._id)) &&
+      (searchParams.get("searchBy") !== "name" || query.split(/\s+/).filter(Boolean).every((word) => product.name?.toLowerCase().includes(word))) &&
       (!values.size || sizes.some((size) => size.toLowerCase() === values.size.toLowerCase())) &&
       (!values.colour || colours.some((colour) => colour.toLowerCase() === values.colour.toLowerCase())) &&
       Number.isFinite(product.price) && product.price >= 0 && product.price <= values.maxPrice &&
@@ -97,9 +101,11 @@ export default function Shop({ collection = "all" }) {
     return 0;
   });
   const activeFilters = [
+    ...(searchParams.has("rikIds") ? [{ key: "rikIds", label: "Rik's matching products" }] : []),
     ...(query ? [{ key: "q", label: values.q }] : []),
     ...["category", "size", "colour"].filter((key) => values[key]).map((key) => ({ key, label: values[key] })),
     ...(values.maxPrice < priceLimit ? [{ key: "maxPrice", label: "Up to \u20b9" + values.maxPrice.toLocaleString("en-IN") }] : []),
+    ...(values.minPrice > 0 ? [{ key: "minPrice", label: "From \u20b9" + values.minPrice.toLocaleString("en-IN") }] : []),
     ...(values.inStock ? [{ key: "inStock", label: "In stock" }] : []),
   ];
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
@@ -114,7 +120,7 @@ export default function Shop({ collection = "all" }) {
   }, { replace: key === "q" || key === "maxPrice", preventScrollReset: true });
   const clearFilters = () => setSearchParams((previous) => {
     const next = new URLSearchParams(previous);
-    for (const key of ["q", "category", "size", "colour", "maxPrice", "inStock", "sort", "page"]) next.delete(key);
+    for (const key of ["q", "category", "size", "colour", "minPrice", "maxPrice", "inStock", "sort", "page", "rikIds"]) next.delete(key);
     return next;
   }, { preventScrollReset: true });
   const filterProps = { values, options, priceLimit, disabled: isLoading || isError, onChange: updateFilter, onClear: clearFilters };
@@ -157,8 +163,8 @@ export default function Shop({ collection = "all" }) {
                 }} /></Group>}
               </>
             ) : <Paper withBorder radius="md" ta="center" p={{ base: 24, md: 48 }}>
-              <Title order={2} size={24} fw={500}>{activeFilters.length ? "No products match your filters." : "This collection is taking shape."}</Title>
-              <Text size="sm" c="dimmed" mt="sm">{activeFilters.length ? "Try another size, colour or price range, or clear all filters." : "Products will appear here as they are added to this collection."}</Text>
+              <Title order={2} size={24} fw={500}>{activeFilters.length ? "No products match your filters." : "No products available right now."}</Title>
+              <Text size="sm" c="dimmed" mt="sm">{activeFilters.length ? "Try another size, colour or price range, or clear all filters." : "Explore another category or check back for new arrivals."}</Text>
               {activeFilters.length > 0 && <Button variant="default" mt="lg" onClick={clearFilters}>Clear all filters</Button>}
             </Paper>}
             <Group gap="lg" mt={28}>{[{ to: "/shop", label: "All clothing" }, { to: "/women", label: "Women" }, { to: "/men", label: "Men" }, { to: "/accessories", label: "Accessories" }].map((link) => <Anchor key={link.to} component={Link} to={link.to} size="xs" c="dimmed">{link.label} <ArrowRight size={12} /></Anchor>)}</Group>

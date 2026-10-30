@@ -49,8 +49,8 @@ export default function About() {
             </span>
           </Title>
           <Text c="dimmed" mt="xl" maw={580} lh={1.9}>
-            A space to explore your style, find a fresh point of view, and bring
-            a little more intention to the everyday.
+            Clothing, accessories and practical shopping guidance, all in one
+            place. Welcome to HIFASHOPNHUB.
           </Text>
         </Reveal>
         <Reveal py={{ base: 48, md: 80 }}>
@@ -64,20 +64,22 @@ export default function About() {
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Text size="xs" c="dimmed" mb="lg" style={{ letterSpacing: 2 }}>
-                OUR PERSPECTIVE
+                OUR STORY
               </Text>
               <Title order={2} fw={500} size="clamp(30px, 4vw, 46px)" lh={1.15}>
                 A wardrobe that feels like you.
               </Title>
               <Text c="dimmed" mt="xl" lh={1.9}>
-                We believe personal style starts with the pieces you reach for,
-                live in, and make your own. Getting dressed is a chance to
-                express who you are, wherever the day takes you.
+                HIFASHOPNHUB brings women's clothing, men's clothing and
+                accessories together in a store built around everyday style.
+                Explore the collection at your own pace and discover pieces
+                that work with your wardrobe.
               </Text>
               <Text c="dimmed" mt="md" lh={1.9}>
-                At HIFASHOPNHUB, you can explore clothing and accessories in one
-                place, discover new arrivals, and find inspiration for your
-                everyday wardrobe.
+                Search by name, colour or size, save favourites to your
+                wishlist and compare the details before you choose. Our size
+                guides and Rik shopping assistant are here to help you find
+                your way from inspiration to a selection that feels right.
               </Text>
               <Button
                 component={Link}
@@ -108,18 +110,18 @@ export default function About() {
             {[
               [
                 <UserRound size={26} strokeWidth={1.4} />,
-                "Personal expression",
-                "Start with what speaks to you. Build a wardrobe around your own taste and your everyday life.",
+                "Style that feels like you",
+                "Explore women's clothing, men's clothing and accessories, with colours and sizes shown on each product.",
               ],
               [
                 <Layers size={26} strokeWidth={1.4} />,
-                "Everyday versatility",
-                "Explore pieces that work together, from familiar favourites to something a little unexpected.",
+                "More confidence in your fit",
+                "Use our measurement guide and Find my size tool to understand the available sizes before choosing.",
               ],
               [
                 <Sparkles size={26} strokeWidth={1.4} />,
-                "Fresh inspiration",
-                "Discover a new perspective through our clothing categories, accessories, and latest additions.",
+                "An easier way to browse",
+                "Search, filter and save your favourites. Ask Rik to find a product or open a preview while you explore.",
               ],
             ].map(([icon, title, description]) => (
               <Box

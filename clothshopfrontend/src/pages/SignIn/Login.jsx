@@ -128,7 +128,7 @@ const Login = () => {
     <AuthLayout
       compact
       title="Welcome back."
-      description="Your next great outfit is waiting. Sign in to your HIFASHOPNHUB."
+      description="Sign in to manage your account and continue exploring HIFASHOPNHUB."
     >
       <form onSubmit={formik.handleSubmit}>
         <Stack gap={14}>

@@ -167,7 +167,7 @@ function ProductContent({ product }) {
             c="dimmed"
             style={{ whiteSpace: "pre-line" }}
           >
-            {product.description || "No description has been provided."}
+            {product.description || "Explore the photos and available options to find your preferred style."}
           </Text>
           <Divider />
           <Box>
@@ -254,7 +254,7 @@ function ProductContent({ product }) {
                 : "No colour or size options listed."}
             </Text>
             <Text size="xs" c="dimmed" mt="xs">
-              Availability is recorded as total stock, not by size or colour.
+              Availability applies to this product across the listed options.
             </Text>
           </Box>
           <Box>

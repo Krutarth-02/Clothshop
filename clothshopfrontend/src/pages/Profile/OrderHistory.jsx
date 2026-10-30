@@ -46,7 +46,7 @@ export default function OrderHistory() {
             Order History
           </Title>
           <Text size="sm" c="dimmed">
-            View your saved purchases and payment details.
+            View your purchase references, payment amounts and status.
           </Text>
         </Stack>
         <Button
@@ -77,8 +77,8 @@ export default function OrderHistory() {
               No orders yet
             </Title>
             <Text size="sm" c="dimmed" maw={350}>
-              Your saved purchases will appear here once a payment record has
-              been created.
+              There are no purchases to show for this account. Explore the
+              collection and save your favourites for later.
             </Text>
             <Button
               component={Link}

@@ -1,67 +1,75 @@
-import { useState } from "react";
-import { ActionIcon, Anchor, Box, Group, Image, Loader, ScrollArea, Stack, Text, TextInput } from "@mantine/core";
+import { useEffect, useState } from "react";
+import { ActionIcon, Anchor, Box, Group, Image, Loader, Overlay, Paper, Portal, ScrollArea, Stack, Text, TextInput } from "@mantine/core";
 import { ArrowUpRight, Search, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetProductsQuery } from "../../redux/auth/productApi";
-import CommonModal from "../common/Modal";
+import { useDebouncedValue, useFocusReturn, useFocusTrap } from "@mantine/hooks";
+import { useSearchProductsInfiniteQuery } from "../../redux/auth/productApi";
 import ErrorAlert from "../common/ErrorAlert";
-import { productOptions } from "../product/productOptions";
-
-function matchingProducts(products, query) {
-  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  if (!words.length) return [];
-  return products.filter((product) => {
-    if (!product?._id || typeof product.name !== "string") return false;
-    const text = [product.name, product.category, product.description, ...productOptions(product.color), ...productOptions(product.size)].filter(Boolean).join(" ").toLowerCase();
-    return words.every((word) => text.includes(word));
-  }).sort((a, b) => Number(b.name.toLowerCase().startsWith(query.trim().toLowerCase())) - Number(a.name.toLowerCase().startsWith(query.trim().toLowerCase())));
-}
 
 export default function ProductSearch({ onOpen, iconSize = 44 }) {
   const [opened, setOpened] = useState(false);
   const [query, setQuery] = useState("");
+  const focusTrapRef = useFocusTrap(opened);
+  useFocusReturn({ opened });
+  useEffect(() => {
+    if (!opened) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [opened]);
+  const [keyword] = useDebouncedValue(query.trim(), 250);
   const navigate = useNavigate();
-  const { data, isLoading, isFetching, isError, refetch } = useGetProductsQuery(undefined, { skip: !opened });
-  const products = Array.isArray(data?.data) ? data.data : [];
-  const matches = matchingProducts(products, query);
+  const { currentData: data, isFetching, isError, isFetchNextPageError, hasNextPage, fetchNextPage, refetch } = useSearchProductsInfiniteQuery(keyword, { skip: !opened || !keyword });
+  const waiting = query.trim() !== keyword;
+  const matches = waiting ? [] : [...new Map((data?.pages || []).flatMap((page) => page.data || []).map((product) => [product._id, product])).values()];
+  const total = data?.pages?.[0]?.total || 0;
+  const isLoading = Boolean(query.trim()) && (waiting || (isFetching && !data));
+  const resultsUrl = `/shop?${new URLSearchParams({ q: query.trim(), searchBy: "name" })}`;
+  const loadMore = () => { if (!waiting && hasNextPage && !isFetching && !isFetchNextPageError) fetchNextPage(); };
   const close = () => { setOpened(false); setQuery(""); };
   const viewAll = (event) => {
     event.preventDefault();
     if (!query.trim()) return;
-    navigate(`/shop?q=${encodeURIComponent(query.trim())}`);
+    navigate(resultsUrl);
     close();
   };
 
   return <>
     <ActionIcon variant="subtle" color="gray" size={iconSize} aria-label="Search products" aria-haspopup="dialog" aria-expanded={opened} onClick={() => { onOpen?.(); setOpened(true); }}><Search size={20} /></ActionIcon>
-    <CommonModal opened={opened} onClose={close} centered={false} yOffset="clamp(24px, 12vh, 120px)" size={640} radius="md" padding={0} withCloseButton={false}
-      aria-label="Search products" overlayProps={{ backgroundOpacity: 0.25, blur: 10 }}
-      styles={{ content: { background: "var(--mantine-color-body)", boxShadow: "0 24px 80px rgba(0,0,0,.2)", border: "1px solid var(--mantine-color-default-border)" }, body: { padding: 0 } }}>
-      <Box p={{ base: 14, sm: 20 }}>
-        <Group justify="space-between" mb="sm"><Text size="10px" c="dimmed" style={{ letterSpacing: 1.5 }}>FIND YOUR NEXT FAVOURITE</Text><ActionIcon variant="subtle" color="gray" size={30} onClick={close} aria-label="Close product search"><X size={18} /></ActionIcon></Group>
-        <form onSubmit={viewAll}>
-          <TextInput data-autofocus aria-label="Search by product name, category, colour or size" placeholder="Search products…" value={query} onChange={(event) => setQuery(event.currentTarget.value)}
-            leftSection={<Search size={20} />} leftSectionWidth={42} rightSection={isFetching ? <Loader size={16} color="gray" /> : query ? <ActionIcon variant="subtle" color="gray" aria-label="Clear search" onClick={() => setQuery("")}><X size={17} /></ActionIcon> : null}
-            styles={{ input: { height: 54, fontSize: "clamp(18px, 3vw, 24px)", borderRadius: 6, background: "transparent" } }} />
+    {opened && <Portal><Box pos="fixed" inset={0} style={{ zIndex: 300 }} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); close(); } }}>
+      <Overlay fixed blur={8} backgroundOpacity={0.18} zIndex={0} onClick={close} aria-hidden="true" />
+      <Box ref={focusTrapRef} pos="absolute" top="clamp(68px, 12vh, 110px)" left="50%" w="min(560px, calc(100vw - 28px))" style={{ transform: "translateX(-50%)", zIndex: 1 }} role="dialog" aria-modal="true" aria-label="Search products">
+        <form onSubmit={viewAll} role="search">
+          <TextInput data-autofocus aria-label="Search by product name" placeholder="Search by product name…" maxLength={120} value={query} onChange={(event) => setQuery(event.currentTarget.value)}
+            leftSection={<Search size={18} />} leftSectionWidth={38} rightSectionWidth={isFetching ? 66 : 38} rightSection={<Group gap={4} wrap="nowrap">{isFetching && <Loader size={14} color="gray" />}<ActionIcon variant="subtle" color="gray" size={28} aria-label="Close product search" onClick={close}><X size={16} /></ActionIcon></Group>}
+            styles={{ input: { height: 44, fontSize: 16, borderRadius: 10, background: "var(--mantine-color-body)", boxShadow: "0 8px 28px #0002" } }} />
         </form>
-        <Box mt="sm" aria-live="polite"><Text size="xs" c="dimmed">{!query.trim() ? "Search by name, category, colour or size." : isLoading ? "Searching products…" : isError ? "Search is temporarily unavailable." : matches.length ? `${matches.length} matching ${matches.length === 1 ? "product" : "products"}` : `No products found for “${query.trim()}”. Try another name or category.`}</Text></Box>
-        {isError ? <ErrorAlert mt="md" title="Products couldn't load" message="Retry to search the collection." onRetry={refetch} /> : query.trim() && !isLoading && matches.length > 0 && <>
-          <ScrollArea.Autosize mah="min(40dvh, 320px)" mt="sm" type="auto" offsetScrollbars>
+        {query.trim() && <Paper mt={8} p={12} radius={10} withBorder shadow="lg" style={{ maxHeight: "calc(100dvh - 190px)", overflowY: "auto" }}>
+        <Box aria-live="polite"><Text size="xs" c="dimmed">{isLoading ? "Searching products…" : isError && !matches.length ? "Search is temporarily unavailable." : matches.length ? `${matches.length} of ${total} matching ${total === 1 ? "product" : "products"}` : `No products found for “${query.trim()}”. Try another product name.`}</Text></Box>
+        {query.trim() && !waiting && isError && !matches.length ? <ErrorAlert mt="md" title="Products couldn't load" message="Retry to search the collection." onRetry={refetch} /> : query.trim() && !isLoading && matches.length > 0 && <>
+          <ScrollArea.Autosize key={keyword} mah="min(40dvh, 320px)" mt="sm" type="auto" offsetScrollbars onBottomReached={loadMore}>
             <Stack gap={0} component="ul" m={0} p={0} style={{ listStyle: "none" }}>
-              {matches.slice(0, 12).map((product) => <Box component="li" key={product._id} style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
-                <Anchor component={Link} to={`/product/${product._id}`} onClick={close} c="var(--mantine-color-text)" underline="never" display="block" py="sm">
-                  <Group wrap="nowrap" gap="md">
-                    <Image src={product.image || null} alt="" w={56} h={68} radius="sm" fit="cover" loading="lazy" fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='68'%3E%3Crect width='100%25' height='100%25' fill='%23e6e3dc'/%3E%3C/svg%3E" />
-                    <Stack gap={4} style={{ flex: 1, minWidth: 0 }}><Text fw={500} size="sm" lineClamp={2}>{product.name}</Text><Text c="dimmed" size="xs">{product.category || "The collection"}</Text>{Number.isFinite(product.price) && <Text size="sm">{new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.price)}</Text>}</Stack>
+              {matches.map((product) => <Box component="li" key={product._id} style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
+                <Anchor component={Link} to={`/product/${product._id}`} onClick={close} c="var(--mantine-color-text)" underline="never" display="block" py={8}>
+                  <Group wrap="nowrap" gap="sm">
+                    <Image src={product.image || null} alt="" w={40} h={48} radius="sm" fit="cover" loading="lazy" fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='68'%3E%3Crect width='100%25' height='100%25' fill='%23e6e3dc'/%3E%3C/svg%3E" />
+                    <Stack gap={2} style={{ flex: 1, minWidth: 0 }}><Text fw={500} size="sm" lineClamp={1}>{product.name}</Text>{Number.isFinite(product.price) && <Text c="dimmed" size="xs">{new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.price)}</Text>}</Stack>
                     <ArrowUpRight size={18} style={{ flexShrink: 0 }} aria-hidden="true" />
                   </Group>
                 </Anchor>
               </Box>)}
             </Stack>
+            {isFetching && <Group justify="center" py="md" role="status"><Loader size="sm" color="gray" /><Text size="xs" c="dimmed">Loading more products…</Text></Group>}
+            {isFetchNextPageError && <ErrorAlert mt="sm" title="More products couldn't load" onRetry={() => fetchNextPage()} />}
+            {!hasNextPage && <Text size="xs" c="dimmed" ta="center" py="sm">All matching products are shown.</Text>}
           </ScrollArea.Autosize>
-          <Anchor component={Link} to={`/shop?q=${encodeURIComponent(query.trim())}`} onClick={close} display="inline-block" mt="lg" size="sm" c="var(--mantine-color-text)">View all results →</Anchor>
+          <Group justify="space-between" mt="sm">
+            <Anchor component={Link} to={resultsUrl} onClick={close} size="sm" c="var(--mantine-color-text)">View all results →</Anchor>
+            {hasNextPage && !isFetchNextPageError && <Anchor component="button" type="button" size="xs" c="dimmed" disabled={isFetching} onClick={loadMore}>Load next 5</Anchor>}
+          </Group>
         </>}
+        </Paper>}
       </Box>
-    </CommonModal>
+    </Box></Portal>}
   </>;
 }

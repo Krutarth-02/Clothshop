@@ -224,12 +224,6 @@ export default function Profile() {
         </Anchor>
         <Text size="sm">My profile</Text>
       </Breadcrumbs>
-      <Text size="xs" c="dimmed" mb="sm" style={{ letterSpacing: 2 }}>
-        YOUR HIFASHOPNHUB
-      </Text>
-      <Title order={1} fw={500} size="clamp(30px, 4vw, 44px)" mb={32}>
-        My profile
-      </Title>
       {error ? (
         <ErrorAlert title="Unable to load profile" onRetry={refetch} />
       ) : data?.data ? (

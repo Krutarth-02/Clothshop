@@ -44,22 +44,22 @@ const clothingCategories = [
     to: "/women",
     image:
       "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80",
-    subtitle: "A little effortless.",
-    headline: "Less ordinary.",
-    accent: "More you.",
+    subtitle: "Style for every day.",
+    headline: "Your everyday style.",
+    accent: "Your way.",
     description:
-      "For slow mornings, spontaneous evenings, and everything in between. Find your everyday favourites.",
+      "Explore women's clothing for workdays, weekends and everything in between. Find colours and styles that feel like you.",
   },
   {
     label: "Men",
     to: "/men",
     image:
       "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=800&q=80",
-    subtitle: "A new kind of classic.",
-    headline: "Your rules.",
-    accent: "Your style.",
+    subtitle: "Everyday essentials.",
+    headline: "Easy to wear.",
+    accent: "Easy to style.",
     description:
-      "A fresh take on the familiar. Discover the men's collection and make the everyday your own.",
+      "Discover men's clothing for your everyday wardrobe. Browse the collection and choose your size, colour and fit.",
   },
   {
     label: "Accessories",
@@ -70,7 +70,7 @@ const clothingCategories = [
     headline: "Small details.",
     accent: "Big impact.",
     description:
-      "The finishing touches that pull it all together. Explore accessories with a point of view.",
+      "Bring your outfit together with accessories that suit your style. Explore the latest additions to the collection.",
   },
 ];
 
@@ -356,14 +356,14 @@ export default function Home() {
               <Title order={3} fw={500}>
                 {search
                   ? "No pieces match your search."
-                  : "Something good is on the way."}
+                  : "No products available right now."}
               </Title>
               <Text size="sm" c="dimmed" mt="sm">
                 {search
                   ? "Try a different search or clear your filters."
                   : category === "All"
-                    ? "New arrivals will appear here as they join the collection."
-                    : "There are no pieces in this edit yet. Explore the rest of the collection."}
+                    ? "Please check back for new additions to the collection."
+                    : "Try another category or explore all products."}
               </Text>
               {(search || category !== "All") && (
                 <Button
@@ -413,7 +413,7 @@ export default function Home() {
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Text size="xs" c="dimmed" mb={25} style={{ letterSpacing: 2 }}>
-                OUR PERSPECTIVE
+                ABOUT HIFASHOPNHUB
               </Text>
               <Title
                 order={2}
@@ -431,12 +431,13 @@ export default function Home() {
                 </span>
               </Title>
               <Text mt={25} c="dimmed" lh={1.9} maw={420}>
-                We believe the best wardrobe is the one that feels like you. The
-                pieces you reach for, live in, and make your own.
+                Discover clothing and accessories for the way you dress every
+                day, from familiar favourites to a new look for the weekend.
               </Text>
               <Text mt={15} c="dimmed" lh={1.9} maw={420}>
-                HIFASHOPNHUB is a space to explore your style, find a fresh point
-                of view, and bring a little more intention to the everyday.
+                Browse by category, compare your options and use our size
+                guidance to choose with confidence. Save your favourites to
+                your wishlist and keep your next outfit in one place.
               </Text>
               <Anchor
                 component={Link}
@@ -460,7 +461,7 @@ export default function Home() {
           bg="var(--mantine-color-default-hover)"
         >
           <Text size="xs" c="dimmed" mb="lg" style={{ letterSpacing: 2 }}>
-            LET'S STAY IN GOOD COMPANY
+            KEEP YOUR FAVOURITES CLOSE
           </Text>
           <Title
             order={2}
@@ -468,15 +469,15 @@ export default function Home() {
             fw={500}
             style={headingStyle}
           >
-            A little style in your inbox.
+            Found something you love?
           </Title>
           <Text c="dimmed" size="sm" mt="md" maw={430} mx="auto" lh={1.8}>
-            Our newsletter is coming soon: new perspectives, fresh edits, and
-            everyday inspiration.
+            Tap the heart on any product to save it to your wishlist. Keep
+            your favourite styles together while you decide.
           </Text>
           <Button
             component={Link}
-            to="/register"
+            to="/wishlist"
             color="dark"
             radius={0}
             size="md"
@@ -485,10 +486,10 @@ export default function Home() {
             w={{ base: "100%", sm: "auto" }}
             styles={buttonStyles}
           >
-            Join the HIFASHOPNHUB community
+            View my wishlist
           </Button>
           <Text size="xs" c="dimmed" mt="md">
-            Create your account today. Newsletter signup isn't available yet.
+            Your wishlist is saved on this device for your next visit.
           </Text>
         </ScrollReveal>
       </Container>
