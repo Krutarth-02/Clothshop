@@ -1,9 +1,9 @@
+import CommonModal from "./Modal";
 import {
   Badge,
   Button,
   Grid,
   Image,
-  Modal,
   Stack,
   Text,
   Title,
@@ -18,7 +18,7 @@ export default function ProductPreview({ product, onClose }) {
   const theme = useMantineTheme();
   const smallScreen = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
   return (
-    <Modal
+    <CommonModal
       opened={Boolean(product)}
       onClose={onClose}
       title="A closer look"
@@ -100,6 +100,6 @@ export default function ProductPreview({ product, onClose }) {
           </Button>
         </>
       )}
-    </Modal>
+    </CommonModal>
   );
 }

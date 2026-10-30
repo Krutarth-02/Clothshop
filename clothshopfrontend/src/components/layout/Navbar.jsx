@@ -1,3 +1,6 @@
+import ActionMenu, { ActionMenuItems } from "../common/ActionMenu";
+import CommonDrawer from "../common/CommonDrawer";
+import UserAvatar from "../common/UserAvatar";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../../redux/auth/authApi";
@@ -12,10 +15,8 @@ import {
   Burger,
   Button,
   Divider,
-  Drawer,
   Group,
   Indicator,
-  Menu,
   Stack,
   Text,
   useMantineTheme,
@@ -31,6 +32,7 @@ import {
   ShoppingBag,
   SunMedium,
   User,
+  X,
 } from "lucide-react";
 import BrandLogo from "../common/BrandLogo";
 import NotificationDrawer from "./NotificationDrawer";
@@ -141,36 +143,6 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
         ? []
         : [{ label: "Retry account", action: retryProfile }]
       : accountLinks;
-  const renderAccountItems = (mobile = false) =>
-    accountItems.map((item) => {
-      const Item = mobile ? Button : Menu.Item;
-      return (
-        <Item
-          key={item.label}
-          {...(item.to ? { component: Link, to: item.to } : {})}
-          leftSection={item.icon}
-          color={item.danger ? "red" : mobile ? "gray" : undefined}
-          {...(mobile ? { variant: "subtle", fullWidth: true } : {})}
-          disabled={signingOut}
-          style={{
-            minHeight: 44,
-            ...(mobile
-              ? {
-                  height: "auto",
-                  justifyContent: "flex-start",
-                  textAlign: "left",
-                }
-              : {}),
-          }}
-          onClick={() => {
-            setMenuOpen(false);
-            if (item.action) void item.action();
-          }}
-        >
-          {item.label}
-        </Item>
-      );
-    });
 
   return (
     <>
@@ -212,7 +184,7 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
             to="/"
             underline="never"
             c="var(--mantine-color-text)"
-            aria-label="Cevraliq home"
+            aria-label="HIFASHOPNHUB home"
             style={{
               flexShrink: 0,
               minHeight: 44,
@@ -302,30 +274,33 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               )}
             </ActionIcon>
             <Box visibleFrom="xl">
-              <Menu position="bottom-end" width={230} shadow="md" withinPortal>
-                <Menu.Target>
-                  <Button
-                    variant="subtle"
+              <ActionMenu width={230} radius="md" offset={8}
+                items={accountItems} disabled={signingOut} onAction={() => setMenuOpen(false)}
+                label={user ? user.fullName : signedIn ? "Checking your account" : "Your HIFASHOPNHUB"}
+                target={<Button
+                    variant="default"
                     color="gray"
-                    size="compact-sm"
+                    size="sm"
+                    radius="xl"
+                    h={44}
+                    pl={6}
+                    pr={12}
+                    styles={{
+                      inner: { gap: 9 },
+                      section: { marginInline: 0, flexShrink: 0 },
+                      label: { fontSize: 13, fontWeight: 500, lineHeight: 1.2 },
+                    }}
                     loading={signingOut || (signedIn && checkingAccount)}
-                    leftSection={<User size={18} />}
-                    rightSection={<ChevronDown size={14} />}
+                    leftSection={user ? (
+                      <UserAvatar user={user}
+                        size={32} radius="xl" color="gray" variant="light"
+                        styles={{ root: { border: "1px solid var(--mantine-color-default-border)", background: "var(--mantine-color-default-hover)" }, placeholder: { fontSize: 13, fontWeight: 600 } }}
+                        />
+                    ) : <User size={18} />}
+                    rightSection={<ChevronDown size={14} strokeWidth={1.7} color="var(--mantine-color-dimmed)" />}
                   >
                     {user ? "My account" : "Account"}
-                  </Button>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Label style={{ overflowWrap: "anywhere" }}>
-                    {user
-                      ? user.fullName
-                      : signedIn
-                        ? "Checking your account"
-                        : "Your Cevraliq"}
-                  </Menu.Label>
-                  {renderAccountItems()}
-                </Menu.Dropdown>
-              </Menu>
+                  </Button>} />
             </Box>
             <Burger
               opened={menuOpen}
@@ -351,14 +326,14 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
         open={notificationsOpen}
         handleClose={() => setNotificationsOpen(false)}
       />
-      <Drawer
-        opened={menuOpen && !desktop}
-        onClose={() => setMenuOpen(false)}
-        title="Cevraliq"
-        size="min(24rem, 100vw)"
+      <CommonDrawer
+        open={menuOpen && !desktop}
+        handleClose={() => setMenuOpen(false)}
+        title="HIFASHOPNHUB"
+        width="min(24rem, 100vw)"
         position="right"
         overlayProps={{ backgroundOpacity: 0.35, blur: 3 }}
-        closeButtonProps={{ size: 44, "aria-label": "Close navigation" }}
+        closeButtonProps={{ size: 44, icon: <X size={18} />, "aria-label": "Close navigation" }}
         styles={{
           body: { paddingBottom: "max(24px, env(safe-area-inset-bottom))" },
         }}
@@ -428,18 +403,20 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
             {user ? "MY ACCOUNT" : "ACCOUNT & HELP"}
           </Text>
           {user && (
-            <Text size="sm" style={{ overflowWrap: "anywhere" }}>
-              {user.fullName}
-            </Text>
+            <Group wrap="nowrap">
+              <UserAvatar user={user}
+                size={40} radius="xl" color="gray" />
+              <Text size="sm" style={{ overflowWrap: "anywhere" }}>{user.fullName}</Text>
+            </Group>
           )}
           {signedIn && checkingAccount && (
             <Text size="sm" c="dimmed">
               Checking your account...
             </Text>
           )}
-          {renderAccountItems(true)}
+          <ActionMenuItems items={accountItems} mobile disabled={signingOut} onAction={() => setMenuOpen(false)} />
         </Stack>
-      </Drawer>
+      </CommonDrawer>
     </>
   );
 }

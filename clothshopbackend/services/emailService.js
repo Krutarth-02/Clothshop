@@ -17,7 +17,7 @@ const sendEmail = async (to, subject, otp) => {
       to,
       subject,
       html: `
-        <h5>ClothShop Password Reset</h5>
+        <h5>HIFASHOPNHUB Password Reset</h5>
         <h4>${otp}</h4>
         <p>This OTP will expire in 5 minutes.</p>
       `,

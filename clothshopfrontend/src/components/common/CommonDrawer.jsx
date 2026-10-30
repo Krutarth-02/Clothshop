@@ -2,14 +2,14 @@ import { Drawer, ScrollArea } from "@mantine/core";
 import { SquareX } from "lucide-react";
 import Tooltipwrapper from "./Tooltipwrapper";
 
-const CommonDrawer = ({ open, handleClose, title, children, width }) => {
+const CommonDrawer = ({ open, handleClose, title, children, width, overlayProps, closeButtonProps, ...props }) => {
   return (
     <Drawer
       opened={open}
       onClose={handleClose}
       title={title}
       position="right"
-      overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+      overlayProps={{ backgroundOpacity: 0.5, blur: 4, ...overlayProps }}
       size={width || 'md'}
       scrollAreaComponent={ScrollArea.Autosize}
       closeButtonProps={{
@@ -22,7 +22,9 @@ const CommonDrawer = ({ open, handleClose, title, children, width }) => {
             />
           </Tooltipwrapper>
         ),
+        ...closeButtonProps,
       }}
+      {...props}
     >
       {children}
  

@@ -36,7 +36,7 @@ export default function ProductCard({ product, onPreview }) {
       >
         <Image
           src={product.image || null}
-          fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Crect width='100%25' height='100%25' fill='%23e6e3dc'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%2364625d' font-family='sans-serif' font-size='14'%3ECevraliq%3C/text%3E%3C/svg%3E"
+          fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Crect width='100%25' height='100%25' fill='%23e6e3dc'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%2364625d' font-family='sans-serif' font-size='14'%3EHIFASHOPNHUB%3C/text%3E%3C/svg%3E"
           alt={product.name}
           h="100%"
           loading="lazy"

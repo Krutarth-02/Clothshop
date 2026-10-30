@@ -46,7 +46,7 @@ const footerLinkGroups = [
     ],
   },
   {
-    title: "YOUR CEVRALIQ",
+    title: "YOUR HIFASHOPNHUB",
     links: [
       { to: "/cart", label: "Shopping bag" },
       {
@@ -97,14 +97,14 @@ export default function Footer() {
               to="/"
               underline="never"
               c="#f3f0e8"
-              aria-label="Cevraliq home"
+              aria-label="HIFASHOPNHUB home"
             >
               <BrandLogo />
             </Anchor>
             <Text size="sm" c="#aaa" lh={1.9} mt={23}>
               Premium fashion for the modern lifestyle.
               <br />
-              Your style. Your story. Your Cevraliq.
+              Your style. Your story. Your HIFASHOPNHUB.
             </Text>
           </Grid.Col>
           {footerLinkGroups.map((group) => (
@@ -168,7 +168,7 @@ export default function Footer() {
                 alignItems: "center",
               }}
             >
-              Join Cevraliq &nearr;
+              Join HIFASHOPNHUB &nearr;
             </Anchor>
           </Grid.Col>
         </Grid>
@@ -177,14 +177,14 @@ export default function Footer() {
           mt={30}
           style={{
             fontFamily: "Poppins, sans-serif",
-            fontSize: "clamp(60px, 16vw, 260px)",
+            fontSize: "clamp(24px, 8.2vw, 150px)",
             lineHeight: 1.3,
             letterSpacing: "-.075em",
             opacity: 0.14,
             whiteSpace: "nowrap",
           }}
         >
-          Cevraliq.
+          HIFASHOPNHUB.
         </Text>
         <Group
           justify="space-between"
@@ -199,7 +199,7 @@ export default function Footer() {
           <Text size="xs">
             &copy;
             {new Date().getFullYear()}
-            Cevraliq. All rights reserved.
+            HIFASHOPNHUB. All rights reserved.
           </Text>
           <Anchor
             component="button"

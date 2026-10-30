@@ -59,7 +59,7 @@ const ResetPassword = () => {
   return (
     <AuthLayout
       title="Back to a good place."
-      description="Choose a new password to finish recovering your Cevraliq account."
+      description="Choose a new password to finish recovering your HIFASHOPNHUB account."
     >
       <form
         onSubmit={(event) => {

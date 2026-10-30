@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { Alert, Button, Center, Loader, Stack } from "@mantine/core";
+import { Center } from "@mantine/core";
+import LoadingState from "../components/common/Loader";
+import ErrorAlert from "../components/common/ErrorAlert";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
 export default function PrivateRoute() {
@@ -14,21 +16,15 @@ export default function PrivateRoute() {
   if (!signedIn) return <Navigate to="/login" replace />;
   if (isLoading || isFetching)
     return (
-      <Center mih="60vh">
-        <Loader aria-label="Checking account access" />
-      </Center>
+      <LoadingState label="Checking account access" />
     );
   if (error?.status === 401 || (!error && !data?.data))
     return <Navigate to="/login" replace />;
   if (error)
     return (
       <Center mih="60vh" p="xl">
-        <Stack>
-          <Alert title="Unable to check account access">
-            Please retry when the server is available.
-          </Alert>
-          <Button onClick={refetch}>Retry</Button>
-        </Stack>
+        <ErrorAlert color="blue" title="Unable to check account access" onRetry={refetch}
+          message="Please retry when the server is available." />
       </Center>
     );
   return <Outlet />;

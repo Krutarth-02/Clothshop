@@ -1,3 +1,4 @@
+import ErrorAlert from "../../components/common/ErrorAlert";
 import {
   ActionIcon,
   Alert,
@@ -140,7 +141,7 @@ export default function Cart({ checkout = false }) {
       <Group justify="space-between" mb={32} gap="md">
         <Box>
           <Text size="xs" c="dimmed" mb="sm" style={{ letterSpacing: 2 }}>
-            {checkout ? "ONE MORE LOOK" : "YOUR CEVRALIQ"}
+            {checkout ? "ONE MORE LOOK" : "YOUR HIFASHOPNHUB"}
           </Text>
           <Title
             order={1}
@@ -193,7 +194,7 @@ export default function Cart({ checkout = false }) {
       ) : (
         <>
           {isError && (
-            <Alert
+            <ErrorAlert
               color="gray"
               title={
                 needsLogin
@@ -215,7 +216,7 @@ export default function Cart({ checkout = false }) {
                   Try again
                 </Button>
               </Group>
-            </Alert>
+            </ErrorAlert>
           )}
           {checkout && (
             <Alert color="gray" title="Checkout review" mb="xl">

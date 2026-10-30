@@ -1,6 +1,6 @@
+import ErrorAlert from "../../components/common/ErrorAlert";
 import { useEffect, useState } from "react";
 import {
-  Alert,
   ActionIcon,
   TextInput,
   Anchor,
@@ -317,7 +317,7 @@ export default function Home() {
           {isLoading ? (
             <ProductGrid loading />
           ) : isError ? (
-            <Alert
+            <ErrorAlert
               color="gray"
               title={
                 needsLogin
@@ -340,7 +340,7 @@ export default function Home() {
                   Try again
                 </Button>
               </Group>
-            </Alert>
+            </ErrorAlert>
           ) : visibleProducts.length ? (
             <ProductGrid
               animate
@@ -435,7 +435,7 @@ export default function Home() {
                 pieces you reach for, live in, and make your own.
               </Text>
               <Text mt={15} c="dimmed" lh={1.9} maw={420}>
-                Cevraliq is a space to explore your style, find a fresh point
+                HIFASHOPNHUB is a space to explore your style, find a fresh point
                 of view, and bring a little more intention to the everyday.
               </Text>
               <Anchor
@@ -446,7 +446,7 @@ export default function Home() {
                 display="inline-block"
                 underline="always"
               >
-                More about Cevraliq <ArrowUpRight size={15} />
+                More about HIFASHOPNHUB <ArrowUpRight size={15} />
               </Anchor>
             </Grid.Col>
           </Grid>
@@ -485,7 +485,7 @@ export default function Home() {
             w={{ base: "100%", sm: "auto" }}
             styles={buttonStyles}
           >
-            Join the Cevraliq community
+            Join the HIFASHOPNHUB community
           </Button>
           <Text size="xs" c="dimmed" mt="md">
             Create your account today. Newsletter signup isn't available yet.

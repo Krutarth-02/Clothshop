@@ -32,7 +32,7 @@ export default function About() {
         </Breadcrumbs>
         <Reveal>
           <Text size="xs" c="dimmed" mb="lg" style={{ letterSpacing: 2 }}>
-            ABOUT CEVRALIQ
+            ABOUT HIFASHOPNHUB
           </Text>
           <Title
             order={1}
@@ -75,7 +75,7 @@ export default function About() {
                 express who you are, wherever the day takes you.
               </Text>
               <Text c="dimmed" mt="md" lh={1.9}>
-                At Cevraliq, you can explore clothing and accessories in one
+                At HIFASHOPNHUB, you can explore clothing and accessories in one
                 place, discover new arrivals, and find inspiration for your
                 everyday wardrobe.
               </Text>
@@ -96,7 +96,7 @@ export default function About() {
         <Reveal
           component="section"
           pb={{ base: 48, md: 80 }}
-          aria-label="What inspires Cevraliq"
+          aria-label="What inspires HIFASHOPNHUB"
         >
           <Text size="xs" c="dimmed" mb="lg" style={{ letterSpacing: 2 }}>
             INDIVIDUAL BY DESIGN

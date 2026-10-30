@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { Center, Loader } from "@mantine/core";
+import LoadingState from "../components/common/Loader";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
 export default function PublicRoute() {
@@ -9,9 +9,7 @@ export default function PublicRoute() {
   });
   if (signedIn && isLoading)
     return (
-      <Center mih="100dvh">
-        <Loader aria-label="Checking account" />
-      </Center>
+      <LoadingState minHeight="100dvh" label="Checking account" />
     );
   if (signedIn && data?.data)
     return (

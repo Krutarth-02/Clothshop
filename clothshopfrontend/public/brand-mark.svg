@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
-  <rect width="48" height="48" rx="14" fill="#242A25"/>
-  <path d="M33 14.5a14 14 0 1 0 0 19" stroke="#F6F2E8" stroke-width="3.2" stroke-linecap="square"/>
-  <path d="m31 19-9 9h10" stroke="#C5B68E" stroke-width="3.2" stroke-linejoin="miter"/>
-  <path d="m22 28 5 5" stroke="#C5B68E" stroke-width="3.2"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">HIFASHOPNHUB shopping bag monogram</title>
+  <rect width="64" height="64" rx="17" fill="#242A25"/>
+  <path d="M17 24h30l3 28H14l3-28Z" stroke="#C5B68E" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M24 25v-7a8 8 0 0 1 16 0v7" stroke="#C5B68E" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M24 33v12M40 33v12M24 39h16" stroke="#F6F2E8" stroke-width="3.2" stroke-linecap="square"/>
 </svg>

@@ -1,11 +1,11 @@
+import ErrorAlert from "../common/ErrorAlert";
+import ActionMenu from "../common/ActionMenu";
 import { useState } from "react";
 import {
   ActionIcon,
-  Alert,
   Anchor,
   Box,
   Button,
-  Menu,
   Skeleton,
   Stack,
   Tabs,
@@ -99,14 +99,9 @@ const NotificationDrawer = ({ open, handleClose }) => {
           </Button>
         </Stack>
       ) : error ? (
-        <Alert color="red" title="Notifications could not load">
-          <Text size="sm">
-            Please try again when your connection is available.
-          </Text>
-          <Button variant="default" mt="md" onClick={refetch}>
-            Retry
-          </Button>
-        </Alert>
+<ErrorAlert title="Notifications could not load" onRetry={refetch}>
+          <Text size="sm">Please try again when your connection is available.</Text>
+        </ErrorAlert>
       ) : isLoading || (isFetching && !data) ? (
         <Stack aria-label="Loading notifications">
           {[1, 2, 3].map((id) => (
@@ -201,14 +196,14 @@ const NotificationDrawer = ({ open, handleClose }) => {
                       </Anchor>
                     )}
                   </Box>
-                  <Menu
-                    position="bottom-end"
-                    withinPortal
-                    shadow="md"
-                    width={165}
-                  >
-                    <Menu.Target>
-                      <ActionIcon
+                  <ActionMenu width={165} disabled={busy}
+                    items={[
+                      { label: "Mark as read", icon: <Check size={15} />, disabled: !unread,
+                        action: () => run(markRead, notification._id), style: { minHeight: 36 } },
+                      { label: "Cancel", icon: <X size={15} />, danger: true,
+                        action: () => run(dismiss, notification._id), style: { minHeight: 36 } },
+                    ]}
+                    target={<ActionIcon
                         variant="subtle"
                         color="gray"
                         size="sm"
@@ -216,26 +211,7 @@ const NotificationDrawer = ({ open, handleClose }) => {
                         disabled={busy}
                       >
                         <MoreHorizontal size={19} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        leftSection={<Check size={15} />}
-                        disabled={!unread || busy}
-                        onClick={() => run(markRead, notification._id)}
-                      >
-                        Mark as read
-                      </Menu.Item>
-                      <Menu.Item
-                        leftSection={<X size={15} />}
-                        color="red"
-                        disabled={busy}
-                        onClick={() => run(dismiss, notification._id)}
-                      >
-                        Cancel
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
+                      </ActionIcon>} />
                 </Box>
               );
             })}

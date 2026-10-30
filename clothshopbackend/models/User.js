@@ -5,7 +5,9 @@ const UserSchema = mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.isGoogleUser && !this.isFacebookUser;
+    },
   },
   role: { type: String, default: "user" },
   firstLoginAt: { type: Date },

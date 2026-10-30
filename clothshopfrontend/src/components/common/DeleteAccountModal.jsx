@@ -1,10 +1,9 @@
+import ErrorAlert from "./ErrorAlert";
+import CommonModal from "./Modal";
 import { useState } from "react";
 import {
   Alert,
   Anchor,
-  Button,
-  Group,
-  Modal,
   PasswordInput,
   Stack,
   Text,
@@ -49,19 +48,20 @@ export default function DeleteAccountModal({ email, onClose }) {
       toast.success("Password reset. Confirm below to delete your account.");
     }} />;
   return (
-    <Modal
-      opened
-      onClose={() => !isLoading && onClose()}
+    <CommonModal
+      onClose={onClose}
+      busy={isLoading}
       title="Delete your account?"
-      centered
-      closeOnEscape={!isLoading}
-      closeOnClickOutside={!isLoading}
+      onSubmit={submit}
+      actions={[
+        { label: "Keep my account", variant: "default", onClick: onClose },
+        { label: "Delete permanently", color: "red", type: "submit", loading: isLoading,
+          disabled: !password || confirmation !== "DELETE", leftSection: <Trash2 size={16} /> },
+      ]}
       closeButtonProps={{
-        disabled: isLoading,
         "aria-label": "Cancel account deletion",
       }}
     >
-      <form onSubmit={submit}>
         <Stack gap="lg">
           <Alert color="red" title="This action is permanent">
             Your account will be removed. You will be
@@ -70,11 +70,7 @@ export default function DeleteAccountModal({ email, onClose }) {
           <Text size="sm" style={{ overflowWrap: "anywhere" }}>
             Account: <strong>{email}</strong>
           </Text>
-          {error && (
-            <Alert color="red" role="alert">
-              {error}
-            </Alert>
-          )}
+          <ErrorAlert message={error} />
           <PasswordInput
             data-autofocus
             label="Current password"
@@ -95,22 +91,7 @@ export default function DeleteAccountModal({ email, onClose }) {
           />
           <Anchor component="button" type="button" size="sm" ta="left" disabled={isLoading}
             onClick={() => { setError(""); setRecovering(true); }}>Forgot password?</Anchor>
-          <Group justify="flex-end">
-            <Button variant="default" onClick={onClose} disabled={isLoading}>
-              Keep my account
-            </Button>
-            <Button
-              color="red"
-              type="submit"
-              loading={isLoading}
-              disabled={!password || confirmation !== "DELETE"}
-              leftSection={<Trash2 size={16} />}
-            >
-              Delete permanently
-            </Button>
-          </Group>
         </Stack>
-      </form>
-    </Modal>
+    </CommonModal>
   );
 }

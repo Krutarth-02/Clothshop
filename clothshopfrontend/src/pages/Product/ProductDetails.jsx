@@ -1,7 +1,7 @@
+import ErrorAlert from "../../components/common/ErrorAlert";
 import { useState } from "react";
 import {
   Accordion,
-  Alert,
   Anchor,
   Badge,
   Box,
@@ -357,7 +357,7 @@ export default function ProductDetails() {
           </Grid.Col>
         </Grid>
       ) : notFound || isError ? (
-        <Alert
+        <ErrorAlert
           color="gray"
           title={
             notFound
@@ -389,7 +389,7 @@ export default function ProductDetails() {
               Back to shop
             </Button>
           </Group>
-        </Alert>
+        </ErrorAlert>
       ) : product ? (
         <ProductContent key={id} product={product} />
       ) : null}

@@ -1,9 +1,8 @@
+import ErrorAlert from "./ErrorAlert";
+import CommonModal from "./Modal";
 import { useState } from "react";
 import {
-  Alert,
   Button,
-  Group,
-  Modal,
   PasswordInput,
   Stack,
   Text,
@@ -72,10 +71,16 @@ export default function AccountRecoveryModal({ email, onClose, onRecovered }) {
     }
   };
   return (
-    <Modal
-      opened
-      onClose={() => !busy && onClose()}
-      centered
+    <CommonModal
+      onClose={onClose}
+      busy={busy}
+      onSubmit={submit}
+      actions={[
+        { label: "Back", variant: "default", onClick: onClose },
+        { label: step === "email" ? "Send verification code" : step === "otp" ? "Verify OTP" : "Save password and continue",
+          type: "submit", color: "dark", loading: busy,
+          disabled: step === "otp" ? otp.length !== 6 : step === "password" ? !password || !confirmPassword : !email },
+      ]}
       title={
         step === "email"
           ? "Forgot password?"
@@ -83,21 +88,13 @@ export default function AccountRecoveryModal({ email, onClose, onRecovered }) {
             ? "Verify your email"
             : "Reset password"
       }
-      closeOnEscape={!busy}
-      closeOnClickOutside={!busy}
-      closeButtonProps={{ disabled: busy }}
     >
-      <form onSubmit={submit}>
         <Stack gap="lg">
           <Text size="sm" c="dimmed">
             Reset your password, then return to confirm account deletion.
           </Text>
           <TextInput label="Account email" value={email || ""} readOnly />
-          {error && (
-            <Alert color="red" role="alert">
-              {error}
-            </Alert>
-          )}
+          <ErrorAlert message={error} />
           {step === "email" && (
             <Text size="sm">
               We will send a six-digit verification code to your account email.
@@ -154,31 +151,7 @@ export default function AccountRecoveryModal({ email, onClose, onRecovered }) {
               </Button>
             </>
           )}
-          <Group justify="flex-end">
-            <Button variant="default" onClick={onClose} disabled={busy}>
-              Back
-            </Button>
-            <Button
-              type="submit"
-              color="dark"
-              loading={busy}
-              disabled={
-                step === "otp"
-                  ? otp.length !== 6
-                  : step === "password"
-                    ? !password || !confirmPassword
-                    : !email
-              }
-            >
-              {step === "email"
-                ? "Send verification code"
-                : step === "otp"
-                  ? "Verify OTP"
-                  : "Save password and continue"}
-            </Button>
-          </Group>
         </Stack>
-      </form>
-    </Modal>
+    </CommonModal>
   );
 }

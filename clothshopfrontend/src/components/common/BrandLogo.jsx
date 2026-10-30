@@ -1,32 +1,32 @@
 import { Group, Image, Stack, Text } from "@mantine/core";
 
-export default function BrandLogo() {
+export default function BrandLogo({ iconSize = { base: 34, sm: 40 }, showTagline = true, ...props }) {
   return (
-    <Group gap={10} wrap="nowrap" aria-hidden="true">
+    <Group gap={10} wrap="nowrap" aria-hidden="true" {...props}>
       <Image
         src={import.meta.env.BASE_URL + "brand-mark.svg"}
         alt=""
-        w={{ base: 34, sm: 40 }}
-        h={{ base: 34, sm: 40 }}
+        w={iconSize}
+        h={iconSize}
         style={{ flexShrink: 0 }}
       />
       <Stack gap={4}>
         <Text
-          fw={600}
-          size="clamp(17px, 2vw, 20px)"
+          fw={700}
+          size="clamp(12px, 1.2vw, 17px)"
           lh={1}
-          style={{ letterSpacing: "-.04em", whiteSpace: "nowrap" }}
+          style={{ letterSpacing: "-.025em", whiteSpace: "nowrap" }}
         >
-          Cevraliq
+          HIFASHOPNHUB
         </Text>
-        <Text
+        {showTagline && <Text
           size="7px"
           fw={500}
           lh={1}
           style={{ letterSpacing: ".18em", whiteSpace: "nowrap", opacity: .7 }}
         >
           WEAR YOUR STORY
-        </Text>
+        </Text>}
       </Stack>
     </Group>
   );

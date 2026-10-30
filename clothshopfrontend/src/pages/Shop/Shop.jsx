@@ -1,6 +1,6 @@
+import ErrorAlert from "../../components/common/ErrorAlert";
 import { useState } from "react";
 import {
-  Alert,
   Anchor,
   Box,
   Breadcrumbs,
@@ -34,7 +34,7 @@ const collectionDetails = {
     title: "A fresh point of view.",
     label: "New Arrivals",
     description:
-      "Discover the latest additions to Cevraliq, with the newest pieces first.",
+      "Discover the latest additions to HIFASHOPNHUB, with the newest pieces first.",
   },
   women: {
     title: "Your style. Your way.",
@@ -170,7 +170,7 @@ export default function Shop({ collection = "all" }) {
           </Breadcrumbs>
           <Reveal>
             <Text size="xs" c="dimmed" mb="md" style={{ letterSpacing: 2 }}>
-              {content.label.toUpperCase()} / CEVRALIQ
+              {content.label.toUpperCase()} / HIFASHOPNHUB
             </Text>
             <Title
               order={1}
@@ -315,7 +315,7 @@ export default function Shop({ collection = "all" }) {
           {isLoading ? (
             <ProductGrid loading placeholderCount={8} spacing="lg" />
           ) : isError ? (
-            <Alert
+            <ErrorAlert
               color="gray"
               title={
                 needsLogin
@@ -338,7 +338,7 @@ export default function Shop({ collection = "all" }) {
                   Try again
                 </Button>
               </Group>
-            </Alert>
+            </ErrorAlert>
           ) : visibleProducts.length ? (
             <>
               <ProductGrid

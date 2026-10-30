@@ -11,8 +11,9 @@ import {
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Reveal from "./Reveal";
+import BrandLogo from "./BrandLogo";
 
-export default function AuthLayout({ title, description, children }) {
+export default function AuthLayout({ title, description, children, compact = false }) {
   return (
     <Box
       component="main"
@@ -57,7 +58,7 @@ export default function AuthLayout({ title, description, children }) {
               fw={700}
               size="xl"
             >
-              Cevraliq.
+              <BrandLogo iconSize={44} />
             </Anchor>
             <Reveal>
               <Text size="xs" mb="lg" style={{ letterSpacing: 3 }}>
@@ -92,8 +93,9 @@ export default function AuthLayout({ title, description, children }) {
           <Stack
             mih="100dvh"
             gap={0}
-            p={{ base: 20, sm: 32, lg: 48 }}
-            pb="max(20px, env(safe-area-inset-bottom))"
+            p={compact ? { base: 16, sm: 24, lg: 32 } : { base: 20, sm: 32, lg: 48 }}
+            py={compact ? "clamp(12px, 2vh, 20px)" : undefined}
+            pb={compact ? "max(12px, env(safe-area-inset-bottom))" : "max(20px, env(safe-area-inset-bottom))"}
             justify="space-between"
           >
             <Anchor
@@ -111,29 +113,29 @@ export default function AuthLayout({ title, description, children }) {
                 minHeight: 44,
               }}
             >
-              <ArrowLeft size={16} /> Back to Cevraliq
+              <ArrowLeft size={16} /> Back to HIFASHOPNHUB
             </Anchor>
             <Reveal
               w="100%"
               maw={440}
               mx="auto"
-              py={{ base: 24, sm: 40 }}
+              py={compact ? { base: 12, sm: 16 } : { base: 24, sm: 40 }}
               style={{ minWidth: 0 }}
             >
-              <Text size="xs" c="dimmed" mb="lg" style={{ letterSpacing: 2 }}>
-                WELCOME TO YOUR CEVRALIQ
+              <Text size="xs" c="dimmed" mb={compact ? 8 : "lg"} style={{ letterSpacing: 2 }}>
+                WELCOME TO YOUR HIFASHOPNHUB
               </Text>
               <Title
                 order={1}
                 fw={500}
-                size="clamp(30px, 4vw, 42px)"
+                size={compact ? "clamp(28px, 3.5vw, 36px)" : "clamp(30px, 4vw, 42px)"}
                 lh={1.15}
-                mb="md"
+                mb={compact ? 8 : "md"}
                 style={{ letterSpacing: "-.04em" }}
               >
                 {title}
               </Title>
-              <Text c="dimmed" size="sm" lh={1.8} mb={32}>
+              <Text c="dimmed" size="sm" lh={compact ? 1.6 : 1.8} mb={compact ? 20 : 32}>
                 {description}
               </Text>
               {children}
@@ -146,7 +148,7 @@ export default function AuthLayout({ title, description, children }) {
               maw={440}
               mx="auto"
             >
-              Cevraliq &copy; {new Date().getFullYear()} · Individual by
+              HIFASHOPNHUB &copy; {new Date().getFullYear()} · Individual by
               design.
             </Text>
           </Stack>

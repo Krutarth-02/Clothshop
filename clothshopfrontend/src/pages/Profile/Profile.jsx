@@ -1,16 +1,17 @@
+import LoadingState from "../../components/common/Loader";
+import FormActions from "../../components/common/FormActions";
+import UserAvatar from "../../components/common/UserAvatar";
+import ErrorAlert from "../../components/common/ErrorAlert";
 import { useState } from "react";
 import { useFormik } from "formik";
 import {
-  Alert,
   Anchor,
-  Avatar,
   Badge,
   Box,
   Breadcrumbs,
   Button,
   Container,
   Grid,
-  Group,
   Paper,
   SimpleGrid,
   Stack,
@@ -80,9 +81,8 @@ function ProfileContent({ user }) {
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <Paper withBorder p="xl" radius="md">
             <Stack align="flex-start" gap="lg">
-              <Avatar
-                src={user.image || null}
-                name={user.fullName}
+              <UserAvatar
+                user={user}
                 color="gray"
                 variant="light"
                 size={72}
@@ -132,11 +132,7 @@ function ProfileContent({ user }) {
               </Text>
               <form onSubmit={form.handleSubmit}>
                 <Stack gap="lg">
-                  {error && (
-                    <Alert color="red" role="alert">
-                      {error}
-                    </Alert>
-                  )}
+                  <ErrorAlert message={error} />
                   <TextInput
                     label="Full name"
                     autoComplete="name"
@@ -176,17 +172,10 @@ function ProfileContent({ user }) {
                       {...field("country")}
                     />
                   </SimpleGrid>
-                  <Group justify="flex-end">
-                    <Button
-                      type="submit"
-                      color="dark"
-                      leftSection={<Save size={17} />}
-                      loading={isLoading}
-                      disabled={!form.dirty}
-                    >
-                      Save changes
-                    </Button>
-                  </Group>
+                  <FormActions actions={[
+                    { label: "Save changes", type: "submit", color: "dark", leftSection: <Save size={17} />,
+                      loading: isLoading, disabled: !form.dirty },
+                  ]} />
                 </Stack>
               </form>
             </Paper>
@@ -233,21 +222,17 @@ export default function Profile() {
         <Text size="sm">My profile</Text>
       </Breadcrumbs>
       <Text size="xs" c="dimmed" mb="sm" style={{ letterSpacing: 2 }}>
-        YOUR CEVRALIQ
+        YOUR HIFASHOPNHUB
       </Text>
       <Title order={1} fw={500} size="clamp(30px, 4vw, 44px)" mb={32}>
         My profile
       </Title>
       {error ? (
-        <Alert color="red" title="Unable to load profile">
-          <Button variant="default" mt="md" onClick={refetch}>
-            Retry
-          </Button>
-        </Alert>
+<ErrorAlert title="Unable to load profile" onRetry={refetch} />
       ) : data?.data ? (
         <ProfileContent key={data.data._id} user={data.data} />
       ) : (
-        <Text c="dimmed">Loading profile...</Text>
+        <LoadingState label="Loading profile" minHeight={160} />
       )}
     </Container>
   );
