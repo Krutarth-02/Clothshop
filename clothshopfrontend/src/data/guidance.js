@@ -292,38 +292,6 @@ export const guidancePages = [
     ]
   },
   {
-    "path": "/contact",
-    "title": "Contact & account help",
-    "summary": "Find the right help for shopping, account access or a purchase query.",
-    "type": "contact",
-    "sections": [
-      {
-        "title": "Shopping and product help",
-        "paragraphs": [
-          "Visit the FAQ for quick answers, or open our size and clothing care guides. Hey Rik can help you search the current collection and open a product preview or detail page."
-        ]
-      },
-      {
-        "title": "Account access",
-        "paragraphs": [
-          "Choose Forgot password to recover access using your registered email. Check the email address and your spam folder if a verification code does not arrive. After signing in, open My Account to update your profile."
-        ]
-      },
-      {
-        "title": "Help with a purchase",
-        "paragraphs": [
-          "Use the contact details supplied with your purchase confirmation or receipt. Include the reference number, product name and a short explanation of the issue. Clear photos help explain an incorrect or damaged item."
-        ],
-        "bullets": [
-          "Keep your purchase and payment reference handy.",
-          "Check Shipping & delivery for address and parcel guidance.",
-          "Review Cancellation & returns before sending an item back.",
-          "Never include passwords, verification codes or full card details in a support message."
-        ]
-      }
-    ]
-  },
-  {
     "path": "/privacy",
     "title": "Privacy & cookies",
     "summary": "Understand the information used by your account and the choices available to you.",
@@ -358,6 +326,12 @@ export const guidancePages = [
         "title": "Manage your information",
         "paragraphs": [
           "You can edit supported profile details or delete your account from My Account. Account deletion does not automatically remove separate payment information. For a purchase-related information query, use the support details supplied with that purchase."
+        ]
+      },
+      {
+        "title": "Contact messages",
+        "paragraphs": [
+          "When you use the Contact Us form, your name, email address, subject and message are sent to our support inbox so we can respond to your enquiry. Please do not include passwords, verification codes or card details."
         ]
       }
     ]
@@ -457,7 +431,7 @@ export const footerGroups = [
         "to": "/about"
       },
       {
-        "label": "Contact & help",
+        "label": "Contact Us",
         "to": "/contact"
       },
       {

@@ -18,6 +18,7 @@ import ProductDetails from "./pages/Product/ProductDetails";
 import Cart from "./pages/Cart/Cart";
 import Profile from "./pages/Profile/Profile";
 import Wishlist from "./pages/Wishlist/Wishlist";
+import Contact from "./pages/Contact/Contact";
 import GuidancePage from "./pages/Guidance/GuidancePage";
 import { guidancePages } from "./data/guidance";
 
@@ -71,6 +72,7 @@ function App() {
               element={<Shop key="accessories" collection="accessories" />}
             />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             {guidancePages.map((page) => (
               <Route key={page.path} path={page.path} element={<GuidancePage key={page.path} page={page} />} />
             ))}

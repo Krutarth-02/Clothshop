@@ -1,4 +1,4 @@
-import { createElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Accordion,
   Anchor,
@@ -26,9 +26,7 @@ import {
   ArrowRight,
   BookOpen,
   CircleHelp,
-  Mail,
   Package,
-  Phone,
   Ruler,
   Search,
   ShieldCheck,
@@ -45,62 +43,6 @@ const topicIcons = {
   "/shipping": Package,
   "/faq": CircleHelp,
 };
-const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL;
-const supportPhone = import.meta.env.VITE_SUPPORT_PHONE;
-
-function ContactActions() {
-  return (
-    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-      {[
-        {
-          title: "My Account",
-          description: "Manage your profile and view purchase and payment information.",
-          to: "/profile",
-          icon: UserRound,
-        },
-        {
-          title: "Password Help",
-          description: "Recover access using your registered email.",
-          to: "/forgot-password",
-          icon: ShieldCheck,
-        },
-        ...(supportEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportEmail)
-          ? [
-              {
-                title: "Email us",
-                description: supportEmail,
-                href: `mailto:${supportEmail}`,
-                icon: Mail,
-              },
-            ]
-          : []),
-        ...(supportPhone && /^[+\d\s()-]{7,25}$/.test(supportPhone)
-          ? [
-              {
-                title: "Call us",
-                description: supportPhone,
-                href: `tel:${supportPhone.replace(/[^+\d]/g, "")}`,
-                icon: Phone,
-              },
-            ]
-          : []),
-      ].map(({ title, description, to, href, icon }) => (
-        <Paper key={title} withBorder radius="md" p="lg">
-          <Group mb="sm">
-            {createElement(icon, { size: 20 })}
-            <Text fw={600}>{title}</Text>
-          </Group>
-          <Text size="sm" c="dimmed" mb="md" lh={1.7}>
-            {description}
-          </Text>
-          <Anchor {...(to ? { component: Link, to } : { href })} size="sm">
-            {to ? "Open guide" : "Get in touch"} &rarr;
-          </Anchor>
-        </Paper>
-      ))}
-    </SimpleGrid>
-  );
-}
 
 function MeasurementGuide() {
   const [unit, setUnit] = useState("cm");
@@ -395,7 +337,7 @@ export default function GuidancePage({ page }) {
               ))}
               {page.type === "hub" && (
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                  {guidancePages
+                  {[...guidancePages, { path: "/contact", title: "Contact Us", summary: "Send us a message for product, account or purchase help." }]
                     .filter((guide) =>
                       [
                         "/how-to-shop",
@@ -436,7 +378,6 @@ export default function GuidancePage({ page }) {
                 </SimpleGrid>
               )}
               {page.type === "size" && <MeasurementGuide />}
-              {page.type === "contact" && <ContactActions />}
               {page.type === "sitemap" && <Sitemap />}
               {page.type === "faq" && (
                 <Stack gap="lg">
