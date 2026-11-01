@@ -10,7 +10,6 @@ import ProductPreview from "../../components/common/ProductPreview";
 import ProductFilters from "../../components/common/ProductFilters";
 import CommonDrawer from "../../components/common/CommonDrawer";
 import ErrorAlert from "../../components/common/ErrorAlert";
-import { filterRikProducts } from "../../components/assistant/rikCommands";
 
 const collectionDetails = {
   all: {
@@ -83,15 +82,16 @@ export default function Shop({ collection = "all" }) {
   };
   const sort = searchParams.get("sort") || (collection === "new" ? "newest" : "featured");
   const query = values.q.trim().toLowerCase();
-  const rikIds = searchParams.get("rikIds")?.split(",").filter((id) => /^[a-f\d]{24}$/i.test(id)) || [];
-  const filteredProducts = filterRikProducts(collectionProducts, { q: query, size: values.size, minPrice: values.minPrice, maxPrice: values.maxPrice, inStock: values.inStock }).filter((product) => {
+  const searchWords = query.replace(/\bt[ -]?shirts?\b/g, "t-shirt").replace(/shirts\b/g, "shirt").split(/\s+/).filter(Boolean);
+  const filteredProducts = collectionProducts.filter((product) => {
     const colours = productOptions(product.color), sizes = productOptions(product.size);
+    const searchText = [product.name, product.category, product.description, ...colours, ...sizes].join(" ").toLowerCase().replace(/\bt[ -]?shirts?\b/g, "t-shirt").replace(/shirts\b/g, "shirt");
     return (!values.category || product.category?.trim().toLowerCase() === values.category.toLowerCase()) &&
-      (!searchParams.has("rikIds") || rikIds.includes(product._id)) &&
+      searchWords.every((word) => searchText.includes(word)) &&
       (searchParams.get("searchBy") !== "name" || query.split(/\s+/).filter(Boolean).every((word) => product.name?.toLowerCase().includes(word))) &&
       (!values.size || sizes.some((size) => size.toLowerCase() === values.size.toLowerCase())) &&
       (!values.colour || colours.some((colour) => colour.toLowerCase() === values.colour.toLowerCase())) &&
-      Number.isFinite(product.price) && product.price >= 0 && product.price <= values.maxPrice &&
+      Number.isFinite(product.price) && product.price >= values.minPrice && product.price <= values.maxPrice &&
       (!values.inStock || (Number.isInteger(product.stock) && product.stock > 0));
   }).sort((a, b) => {
     if (sort === "price-asc") return a.price - b.price;
@@ -101,7 +101,6 @@ export default function Shop({ collection = "all" }) {
     return 0;
   });
   const activeFilters = [
-    ...(searchParams.has("rikIds") ? [{ key: "rikIds", label: "Rik's matching products" }] : []),
     ...(query ? [{ key: "q", label: values.q }] : []),
     ...["category", "size", "colour"].filter((key) => values[key]).map((key) => ({ key, label: values[key] })),
     ...(values.maxPrice < priceLimit ? [{ key: "maxPrice", label: "Up to \u20b9" + values.maxPrice.toLocaleString("en-IN") }] : []),
@@ -120,7 +119,7 @@ export default function Shop({ collection = "all" }) {
   }, { replace: key === "q" || key === "maxPrice", preventScrollReset: true });
   const clearFilters = () => setSearchParams((previous) => {
     const next = new URLSearchParams(previous);
-    for (const key of ["q", "category", "size", "colour", "minPrice", "maxPrice", "inStock", "sort", "page", "rikIds"]) next.delete(key);
+    for (const key of ["q", "category", "size", "colour", "minPrice", "maxPrice", "inStock", "sort", "page"]) next.delete(key);
     return next;
   }, { preventScrollReset: true });
   const filterProps = { values, options, priceLimit, disabled: isLoading || isError, onChange: updateFilter, onClear: clearFilters };

@@ -12,12 +12,6 @@ export const guidancePages = [
           "Looking for a particular style? Search by product name, or browse our Women, Men and Accessories collections. Use collection filters for colour, size and budget. Open a product to check its options and current availability.",
           "For help with your account, visit My Account or use Forgot password to recover access. Choose a topic below for shopping, sizing, delivery and payment guidance."
         ]
-      },
-      {
-        "title": "Meet Rik, your shopping assistant",
-        "paragraphs": [
-          "Click the Rik robot at the bottom of the page and allow microphone access when asked. Begin every spoken instruction with \"Hey Rik\" to search the collection, open a product or visit your wishlist. Click the robot again to stop listening."
-        ]
       }
     ]
   },
@@ -274,10 +268,6 @@ export const guidancePages = [
         "Sign in, open My Account and select Order History to view available purchase and payment details."
       ],
       [
-        "How do I use Hey Rik?",
-        "Click the robot button and allow microphone access. A green indicator shows that Rik is listening. Begin each command with \"Hey Rik\", for example \"Hey Rik, show blue shirt under 1000\". Click the robot again or say \"Hey Rik, stop listening\" to turn it off."
-      ],
-      [
         "How do I reset my password?",
         "Choose Forgot password on the sign-in page, enter your registered email and follow the verification code and password reset steps."
       ],
@@ -307,13 +297,6 @@ export const guidancePages = [
         "title": "Information saved on your device",
         "paragraphs": [
           "Cookies help keep you signed in. Browser storage remembers your theme, shopping bag, wishlist and account identifiers on this device. Clearing site data may sign you out and remove these saved preferences. Sign out when using a shared device."
-        ]
-      },
-      {
-        "title": "Voice shopping with Rik",
-        "paragraphs": [
-          "Microphone access starts after you click Rik and grant browser permission. Recognition may use your browser's online speech service. Click the robot again or say \"Hey Rik, stop listening\" to stop; it also stops when the tab is hidden.",
-          "Spoken commands are processed to carry out supported shopping actions. Voice commands are not saved to your account by this feature. Do not include passwords or payment credentials in a command."
         ]
       },
       {
@@ -360,9 +343,9 @@ export const guidancePages = [
         ]
       },
       {
-        "title": "Size recommendations and Rik",
+        "title": "Size recommendations",
         "paragraphs": [
-          "Fit recommendations are estimates based on the displayed chart and your measurements. A sample chart is not a verified product measurement. Rik supports product searches, previews and page navigation. Check the selected product and options before adding anything to your bag."
+          "Fit recommendations are estimates based on the displayed chart and your measurements. A sample chart is not a verified product measurement. Check the selected product and options before adding anything to your bag."
         ]
       },
       {
@@ -402,7 +385,7 @@ export const guidancePages = [
       {
         "title": "Keep payment details private",
         "paragraphs": [
-          "Never share a card security code, banking OTP or UPI PIN in a chat, call or voice command. Do not install remote-access software or approve an unexpected payment request to receive a refund."
+          "Never share a card security code, banking OTP or UPI PIN in a chat or call. Do not install remote-access software or approve an unexpected payment request to receive a refund."
         ]
       },
       {

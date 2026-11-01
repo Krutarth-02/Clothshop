@@ -78,7 +78,7 @@ export default function About() {
               <Text c="dimmed" mt="md" lh={1.9}>
                 Search by name, colour or size, save favourites to your
                 wishlist and compare the details before you choose. Our size
-                guides and Rik shopping assistant are here to help you find
+                guides are here to help you find
                 your way from inspiration to a selection that feels right.
               </Text>
               <Button
@@ -121,7 +121,7 @@ export default function About() {
               [
                 <Sparkles size={26} strokeWidth={1.4} />,
                 "An easier way to browse",
-                "Search, filter and save your favourites. Ask Rik to find a product or open a preview while you explore.",
+                "Search, filter and save your favourites. Open a product preview to compare details while you explore.",
               ],
             ].map(([icon, title, description]) => (
               <Box
