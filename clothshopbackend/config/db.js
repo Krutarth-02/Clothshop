@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
-const connectDB = () => {
-    mongoose.connect(process.env.MONGODB_URL).then(() => {
-        console.log("Connected to MongoDB");
-    }).catch((err) => {
-        console.error("Error connecting to MongoDB:", err);
-        process.exit(1);
-    });
+const connectDB = async () => {
+    await mongoose.connect(process.env.MONGODB_URL);
+    // Checkout requires the uniqueness indexes before requests are accepted.
+    await require("../models/User").init();
+    await require("../models/Payment").init();
+    console.log("Connected to MongoDB");
 };
 module.exports = connectDB;

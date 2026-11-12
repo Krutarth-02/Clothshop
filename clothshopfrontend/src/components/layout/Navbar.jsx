@@ -27,7 +27,6 @@ import {
   Bell,
   ChevronDown,
   Moon,
-  Gift,
   Heart,
   LogOut,
   Trash2,
@@ -122,26 +121,28 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
   const actionSize = desktop ? 36 : 44;
   const { gutter = { base: 16, sm: 24, lg: 40 } } = theme.other || {};
 
+  const accountActions = user ? [
+    {
+      label: signingOut ? "Signing out..." : "Sign out",
+      icon: <LogOut size={17} />,
+      action: signOut,
+    },
+    {
+      label: "Delete account",
+      icon: <Trash2 size={17} />,
+      danger: true,
+      action: () => setDeleteOpen(true),
+    },
+  ] : [];
   const accountItems = user
     ? [
         { label: "My profile", to: "/profile", icon: <User size={17} /> },
-        { label: "Shopping bag", to: "/cart", icon: <ShoppingBag size={17} /> },
+        { label: `Shopping bag (${cartCount})`, to: "/cart", icon: <ShoppingBag size={17} /> },
         { label: "Wishlist", to: "/wishlist", icon: <Heart size={17} /> },
         {
           label: "Notifications",
-          icon: <Gift size={17} />,
+          icon: <Bell size={17} />,
           action: () => setNotificationsOpen(true),
-        },
-        {
-          label: signingOut ? "Signing out..." : "Sign out",
-          icon: <LogOut size={17} />,
-          action: signOut,
-        },
-        {
-          label: "Delete account",
-          icon: <Trash2 size={17} />,
-          danger: true,
-          action: () => setDeleteOpen(true),
         },
       ]
     : signedIn
@@ -296,7 +297,7 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
             </ActionIcon>
             <Box visibleFrom="xl">
               <ActionMenu width={230} radius="md" offset={8}
-                items={accountItems} disabled={signingOut} onAction={() => setMenuOpen(false)}
+                items={[...accountItems, ...accountActions]} disabled={signingOut} onAction={() => setMenuOpen(false)}
                 label={user ? user.fullName : signedIn ? "Checking your account" : "Your HIFASHOPNHUB"}
                 target={<Button
                     variant="default"
@@ -356,6 +357,8 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
         overlayProps={{ backgroundOpacity: 0.35, blur: 3 }}
         closeButtonProps={{ size: 44, icon: <X size={18} />, "aria-label": "Close navigation" }}
         styles={{
+          header: { borderBottom: "1px solid var(--mantine-color-default-border)", paddingInline: 20 },
+          title: { fontSize: 14, fontWeight: 600, letterSpacing: 1 },
           body: { paddingBottom: "max(24px, env(safe-area-inset-bottom))" },
         }}
       >
@@ -363,33 +366,38 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
           component="nav"
           id="mobile-navigation"
           aria-label="Mobile navigation"
-          gap="lg"
+          gap={20}
           py="md"
         >
           <Text size="xs" c="dimmed" style={{ letterSpacing: 2 }}>
             SHOP &amp; DISCOVER
           </Text>
+          <Stack gap={2}>
           {shopLinks.map((link) => (
             <Anchor
               key={link.label}
               component={Link}
               to={link.to}
               aria-current={pathname === link.to ? "page" : undefined}
-              fw={pathname === link.to ? 700 : 400}
+              fw={pathname === link.to ? 600 : 400}
               onClick={() => setMenuOpen(false)}
-              size="lg"
+              size="md"
               c="var(--mantine-color-text)"
-              underline="hover"
-              style={{ display: "block", paddingBlock: 10, minHeight: 44 }}
+              underline="never"
+              style={{
+                display: "flex", alignItems: "center", padding: "10px 12px", minHeight: 44, borderRadius: 8,
+                background: pathname === link.to ? "var(--mantine-color-default-hover)" : undefined,
+              }}
             >
-              <Group justify="space-between">
+              <Group justify="space-between" w="100%" wrap="nowrap">
                 {link.label}
-                <ArrowUpRight size={18} />
+                <ArrowUpRight size={16} color="var(--mantine-color-dimmed)" />
               </Group>
             </Anchor>
           ))}
+          </Stack>
           <Divider />
-          <Anchor
+          {!user && <Anchor
             component={Link}
             to="/cart"
             onClick={() => setMenuOpen(false)}
@@ -403,7 +411,7 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
             }}
           >
             <ShoppingBag size={19} /> Shopping bag ({cartCount})
-          </Anchor>
+          </Anchor>}
           <Button
             hiddenFrom="xs"
             variant="default"
@@ -419,15 +427,21 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
           >
             Switch to {colorScheme === "dark" ? "light" : "dark"} theme
           </Button>
-          <Divider />
+          {!user && <Divider />}
           <Text size="xs" c="dimmed" style={{ letterSpacing: 2 }}>
             {user ? "MY ACCOUNT" : "ACCOUNT & HELP"}
           </Text>
           {user && (
-            <Group wrap="nowrap">
+            <Group wrap="nowrap" gap={12} p="md" style={{
+              border: "1px solid var(--mantine-color-default-border)", borderRadius: 10,
+              background: "var(--mantine-color-default-hover)",
+            }}>
               <UserAvatar user={user}
-                size={40} radius="xl" color="gray" />
-              <Text size="sm" style={{ overflowWrap: "anywhere" }}>{user.fullName}</Text>
+                size={42} radius="xl" color="gray" style={{ flexShrink: 0 }} />
+              <Box style={{ minWidth: 0 }}>
+                <Text size="sm" fw={600} truncate>{user.fullName}</Text>
+                {user.email && <Text size="xs" c="dimmed" truncate mt={3}>{user.email}</Text>}
+              </Box>
             </Group>
           )}
           {signedIn && checkingAccount && (
@@ -435,7 +449,18 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
               Checking your account...
             </Text>
           )}
-          <ActionMenuItems items={accountItems} mobile disabled={signingOut} onAction={() => setMenuOpen(false)} />
+          <Stack gap={4}>
+            <ActionMenuItems
+              items={accountItems}
+              mobile disabled={signingOut} onAction={() => setMenuOpen(false)} />
+          </Stack>
+          {user && <>
+            <Divider />
+            <Stack gap={4}>
+              <ActionMenuItems items={accountActions}
+                mobile disabled={signingOut} onAction={() => setMenuOpen(false)} />
+            </Stack>
+          </>}
         </Stack>
       </CommonDrawer>
     </>

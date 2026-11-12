@@ -14,7 +14,8 @@ export default function PrivateRoute() {
     },
   );
   if (!signedIn) return <Navigate to="/login" replace />;
-  if (isLoading || isFetching)
+  // Background profile refreshes must preserve mounted checkout/form state.
+  if (isLoading || (isFetching && !data))
     return (
       <LoadingState label="Checking account access" />
     );

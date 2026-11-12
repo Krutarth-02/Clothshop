@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useGetProductByIdQuery } from "../../redux/auth/productApi";
 import { addToCart, createCartItem, setBuyNowItem } from "../../redux/cart/cartSlice";
-import { productColor, productOptions } from "../product/productOptions";
+import { productColor, productImages, productOptions } from "../product/productOptions";
 import CommonModal from "./Modal";
 import WishlistButton from "./WishlistButton";
 import ErrorAlert from "./ErrorAlert";
@@ -25,7 +25,7 @@ function PreviewContent({ product, onClose, checking, verified, error, onRetry }
   const [chosenImage, setImage] = useState(0);
   const colour = colours.includes(chosenColour) ? chosenColour : colours[0] || "";
   const size = sizes.includes(chosenSize) ? chosenSize : sizes[0] || "";
-  const images = [...new Set([product.image, ...(Array.isArray(product.images) ? product.images.map((image) => typeof image === "string" ? image : image?.url) : [])].filter((image) => typeof image === "string" && image.trim()))];
+  const { images, matchesColor } = productImages(product, colour);
   const imageIndex = Math.min(chosenImage, Math.max(0, images.length - 1));
   const available = Number.isInteger(product.stock) && product.stock > 0;
   const inCart = cartItems.filter((item) => item.productId === product._id).reduce((sum, item) => sum + item.quantity, 0);
@@ -49,7 +49,7 @@ function PreviewContent({ product, onClose, checking, verified, error, onRetry }
 
   return <Box>
     <Box pos="relative" style={{ overflow: "hidden", background: "var(--mantine-color-default-hover)" }}>
-      <Image src={images[imageIndex] || null} alt={product.name} w="100%" h="clamp(240px, 40dvh, 360px)" fit="cover" style={{ display: "block", objectPosition: "center" }}
+      <Image src={images[imageIndex] || null} alt={matchesColor ? `${product.name} in ${colour}` : product.name} w="100%" h="clamp(240px, 40dvh, 360px)" fit="cover" style={{ display: "block", objectPosition: "center" }}
         fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='360'%3E%3Cpath d='M170 215l38-44 27 26 22-29 36 47H170z' fill='%238b9691'/%3E%3C/svg%3E" />
       {onSale && <Badge pos="absolute" top={14} left={14} color="red" radius="xl" size="sm">{Math.round((1 - product.price / product.originalPrice) * 100)}% OFF</Badge>}
       <WishlistButton product={product} size={30} style={{ position: "absolute", right: 48, top: 12, background: "#fff", color: accent, border: "none", boxShadow: "0 2px 8px #263c3512" }} />
@@ -80,12 +80,13 @@ function PreviewContent({ product, onClose, checking, verified, error, onRetry }
         <Group gap={5} role="group" aria-label="Select a colour">{colours.map((option) => {
           const swatch = productColor(option);
           return <ActionIcon key={option} size={24} radius="xl" variant="transparent" disabled={!verified} aria-label={`Select ${option}`} title={option} aria-pressed={option === colour}
-            onClick={() => setColour(option)} style={{ border: option === colour ? `2px solid ${accent}` : "2px solid transparent" }}>
+            onClick={() => { setColour(option); setImage(0); }} style={{ border: option === colour ? `2px solid ${accent}` : "2px solid transparent" }}>
             <Box w={16} h={16} bg={swatch || "var(--mantine-color-default-hover)"} style={{ borderRadius: "50%", border: "1px solid var(--mantine-color-default-border)", display: "grid", placeItems: "center" }}>{!swatch && <Text size="7px">{option.slice(0, 2)}</Text>}</Box>
           </ActionIcon>;
         })}</Group>
         <Text size="10px" c="dimmed">{colour}</Text>
       </Group>}
+      {colours.length > 1 && !matchesColor && <Text size="10px" c="dimmed" aria-live="polite">Photo for {colour} is not available. Showing the product photo.</Text>}
       <Group justify="space-between" align="center" gap={8} mt={1}>
         <Group gap={8} align="baseline"><Text size={26} fw={700} lh={1.1} style={{ letterSpacing: "-.04em" }}>{validPrice ? money(product.price) : "Price unavailable"}</Text>{onSale && <Text size="xs" c="dimmed" td="line-through">{money(product.originalPrice)}</Text>}</Group>
         <Badge variant="light" size="xs" color={verified && available ? "green" : verified ? "red" : "gray"}>{checking ? "Checking" : !verified ? "Unconfirmed" : available ? "In stock" : "Sold out"}</Badge>

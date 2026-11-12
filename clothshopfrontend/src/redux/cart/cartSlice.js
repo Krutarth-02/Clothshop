@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { productOptions } from "../../components/product/productOptions";
+import { productImages, productOptions } from "../../components/product/productOptions";
 
 // Cart state stays local until the backend provides cart/order endpoints.
 
@@ -71,6 +71,7 @@ const cartSlice = createSlice({
         existing.quantity += item.quantity;
         existing.price = item.price;
         existing.stock = item.stock;
+        existing.image = item.image;
       } else state.items.push({ ...item, key });
     },
     removeCartItem(state, { payload: key }) {
@@ -143,7 +144,7 @@ export function createCartItem(product, color, size, quantity) {
   const item = {
     productId: product._id,
     name: product.name,
-    image: product.image || "",
+    image: productImages(product, color).images[0] || "",
     price: Math.round(product.price * 100) / 100,
     color: color || "",
     size: size || "",

@@ -34,6 +34,7 @@ import ProductPreview from "../../components/common/ProductPreview";
 import SizeGuide from "../../components/product/SizeGuide";
 import {
   productColor,
+  productImages,
   productOptions,
 } from "../../components/product/productOptions";
 
@@ -82,6 +83,7 @@ function ProductContent({ product }) {
   const [chosenSize, setChosenSize] = useState(sizes[0] || "");
   const [quantity, setQuantity] = useState(1);
   const color = colors.includes(chosenColor) ? chosenColor : colors[0] || "";
+  const { images, matchesColor } = productImages(product, color);
   const size = sizes.includes(chosenSize) ? chosenSize : sizes[0] || "";
   const stockKnown = typeof product.stock === "number";
   const available = Number.isInteger(product.stock) && product.stock > 0;
@@ -118,8 +120,8 @@ function ProductContent({ product }) {
       <Grid.Col span={{ base: 12, md: 7 }}>
         <Box bg="var(--mantine-color-default-hover)">
           <Image
-            src={product.image || null}
-            alt={product.name}
+            src={images[0] || null}
+            alt={matchesColor ? `${product.name} in ${color}` : product.name}
             h={{ base: 360, sm: 480, lg: 580 }}
             fit="contain"
             fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect width='100%25' height='100%25' fill='%23e6e3dc'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%2364625d' font-family='sans-serif'%3EPhoto unavailable%3C/text%3E%3C/svg%3E"
@@ -215,6 +217,11 @@ function ProductContent({ product }) {
             ) : (
               <Text size="sm" c="dimmed">
                 No colour options have been listed.
+              </Text>
+            )}
+            {colors.length > 1 && !matchesColor && (
+              <Text size="xs" c="dimmed" mt="sm" aria-live="polite">
+                Photo for {color} is not available. Showing the product photo.
               </Text>
             )}
           </Box>

@@ -16,6 +16,7 @@ import Shop from "./pages/Shop/Shop";
 import About from "./pages/About/About";
 import ProductDetails from "./pages/Product/ProductDetails";
 import Cart from "./pages/Cart/Cart";
+import Checkout from "./pages/Cart/Checkout";
 import Profile from "./pages/Profile/Profile";
 import Wishlist from "./pages/Wishlist/Wishlist";
 import Contact from "./pages/Contact/Contact";
@@ -79,8 +80,8 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/checkout" element={<Cart checkout />} />
             <Route element={<PrivateRoute />}>
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/home" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

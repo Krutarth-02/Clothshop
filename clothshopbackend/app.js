@@ -32,6 +32,7 @@ app.use("/api/user", userRoute);
 app.use("/api/notifications", notificationRoute);
 app.use("/api/payments", paymentRoute);
 app.use("/api/contact", contactRoute);
+app.use("/api/coupons", require("./routes/coupon.routes"));
 app.use(errorHandler);
 
 const port = process.env.PORT || 3000;

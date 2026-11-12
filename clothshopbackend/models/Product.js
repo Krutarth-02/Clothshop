@@ -15,6 +15,14 @@ const ProductSchema = new mongoose.Schema({
     image: {
         type: String,
     },
+    // Actual photos of this product in each available colour.
+    colorImages: {
+        type: [new mongoose.Schema({
+            color: { type: String, required: true, trim: true },
+            images: { type: [{ type: String, trim: true }], default: [] }
+        }, { _id: false })],
+        default: undefined
+    },
     color: {
         type: [String],
     },
@@ -35,4 +43,11 @@ const ProductSchema = new mongoose.Schema({
         type: Number,
     }
 }, { timestamps: true });
+ProductSchema.statics.imageForColor = (product, color) => {
+    const selected = String(color || '').trim().toLowerCase();
+    const photos = Array.isArray(product.colorImages)
+        ? product.colorImages.find((item) => String(item?.color || '').trim().toLowerCase() === selected)
+        : null;
+    return (photos?.images?.find((image) => typeof image === 'string' && image.trim()) || product.image || '').trim();
+};
 module.exports = mongoose.model('Product', ProductSchema);

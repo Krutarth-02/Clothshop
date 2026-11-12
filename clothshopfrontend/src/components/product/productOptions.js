@@ -15,6 +15,24 @@ export function productOptions(value) {
   ];
 }
 
+// Keep product photos tied to colour names, never to the swatch's array index.
+export function productImages(product, color) {
+  const selected = String(color || "").trim().toLowerCase();
+  const variant = Array.isArray(product.colorImages)
+    ? product.colorImages.find((item) => String(item?.color || "").trim().toLowerCase() === selected)
+    : null;
+  const urls = (images) => [...new Set(images
+    .map((image) => typeof image === "string" ? image : image?.url)
+    .filter((image) => typeof image === "string" && image.trim())
+    .map((image) => image.trim()))];
+  const variantImages = urls(Array.isArray(variant?.images) ? variant.images : []);
+  if (variantImages.length) return { images: variantImages, matchesColor: true };
+  return {
+    images: urls([product.image, ...(Array.isArray(product.images) ? product.images : [])]),
+    matchesColor: false,
+  };
+}
+
 const shades = {
   white: "#f5f3ed",
   black: "#242424",
