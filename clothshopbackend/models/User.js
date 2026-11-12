@@ -9,7 +9,8 @@ const UserSchema = mongoose.Schema({
       return !this.isGoogleUser && !this.isFacebookUser;
     },
   },
-  role: { type: String, default: "user" },
+  role: { type: String, enum: ["user", "admin", "superadmin"], default: "user" },
+  adminSessionVersion: { type: Number, default: 0, select: false },
   firstLoginAt: { type: Date },
   welcomeCouponIssuedAt: { type: Date },
   welcomeCouponCode: { type: String, unique: true, sparse: true },
@@ -36,4 +37,6 @@ const UserSchema = mongoose.Schema({
     default: false,
   },
 });
+UserSchema.index({ role: 1, lastLoginAt: -1 });
+UserSchema.index({ role: 1, firstLoginAt: -1 });
 module.exports = mongoose.model("User", UserSchema);

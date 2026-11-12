@@ -1,5 +1,6 @@
 const Payment = require("../models/Payment");
 const User = require("../models/User");
+const AdminActivity = require("../models/AdminActivity");
 const { UnauthorizedError } = require("../utils/errors");
 const { normalizeCheckout, buildQuote, placeCodOrder } = require("../services/checkout");
 
@@ -46,6 +47,9 @@ async function quoteCheckout(req, res, next) {
 async function createCodOrder(req, res, next) {
   try {
     const data = await placeCodOrder(req.user.userId, req.body);
+    await AdminActivity.updateOne({ action: "ORDER_PLACED", recordId: String(data._id) }, {
+      $setOnInsert: { userId: req.user.userId, resource: "orders", status: 201 },
+    }, { upsert: true }).catch(() => console.error("Order activity could not be recorded."));
     res.status(201).json({ message: "Your cash on delivery order is confirmed.", data });
   } catch (error) {
     next(error);

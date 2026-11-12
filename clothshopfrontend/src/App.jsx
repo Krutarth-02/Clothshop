@@ -22,6 +22,11 @@ import Wishlist from "./pages/Wishlist/Wishlist";
 import Contact from "./pages/Contact/Contact";
 import GuidancePage from "./pages/Guidance/GuidancePage";
 import { guidancePages } from "./data/guidance";
+import AdminRoute from "./routes/AdminRoute";
+const AdminLogin = React.lazy(() => import("./pages/Admin/AdminLogin"));
+const AdminLayout = React.lazy(() => import("./routes/AdminLayout"));
+const AdminDashboard = React.lazy(() => import("./pages/Admin/AdminDashboard"));
+const AdminManagement = React.lazy(() => import("./pages/Admin/AdminManagement"));
 
 function App() {
   const [colorScheme, setColorScheme] = React.useState(
@@ -39,7 +44,19 @@ function App() {
     <MantineProvider theme={theme} forceColorScheme={colorScheme || "light"}>
       <Toaster position="top-right" />
       <BrowserRouter>
+        <React.Suspense fallback={<div role="status">Loading workspace...</div>}>
         <Routes>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="products" element={<AdminManagement key="products" resource="products" />} />
+              <Route path="customers" element={<AdminManagement key="customers" resource="users" />} />
+              <Route path="orders" element={<AdminManagement key="orders" resource="orders" />} />
+              <Route path="team" element={<AdminManagement key="team" resource="users" staff />} />
+              <Route path="activity" element={<AdminManagement key="activity" resource="activity" />} />
+            </Route>
+          </Route>
           {/* Authentication Routes */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
@@ -87,6 +104,7 @@ function App() {
             </Route>
           </Route>
         </Routes>
+        </React.Suspense>
       </BrowserRouter>
     </MantineProvider>
   );
