@@ -1,4 +1,5 @@
 import { api } from "../api/api";
+import { handleCreateCodOrder } from "./payment.dispacher";
 
 export const paymentApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,7 +12,9 @@ export const paymentApi = api.injectEndpoints({
     }),
     createCodOrder: builder.mutation({
       query: (body) => ({ url: "/payments/orders", method: "POST", body }),
-      invalidatesTags: (result, error) => error ? [] : ["Products", "Payments", "WelcomeCoupon", "Profile", "Notifications"],
+      async onQueryStarted(arg, toolkitApi) {
+        await handleCreateCodOrder(arg, toolkitApi);
+      },
     }),
   }),
 });

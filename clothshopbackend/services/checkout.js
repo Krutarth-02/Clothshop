@@ -1,9 +1,8 @@
 const { createHash } = require("node:crypto");
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
-const User = require("../models/User");
 const Payment = require("../models/Payment");
-const { BadRequestError, ConflictError, UnauthorizedError } = require("../utils/errors");
+const { BadRequestError, ConflictError } = require("../utils/errors");
 
 function requiredText(value, label, maximumLength) {
   if (typeof value !== "string" || !value.trim() || value.trim().length > maximumLength) {
@@ -49,11 +48,7 @@ function normalizeCheckout(body = {}) {
   if (!/^[1-9]\d{5}$/.test(shippingAddress.postalCode)) {
     throw new BadRequestError("Enter a valid 6-digit PIN code.");
   }
-  if (body.couponCode != null && (typeof body.couponCode !== "string" || body.couponCode.length > 50)) {
-    throw new BadRequestError("Enter a valid coupon code.");
-  }
-  const couponCode = (body.couponCode || "").trim().toUpperCase();
-  return { items, shippingAddress, paymentMethod: "cod", couponCode };
+  return { items, shippingAddress, paymentMethod: "cod" };
 }
 
 function calculateItems(requestedItems, products) {
@@ -91,21 +86,6 @@ function calculateItems(requestedItems, products) {
 async function buildQuote(userId, checkout, session = null) {
   const products = await Product.find({ _id: { $in: checkout.items.map((item) => item.productId) } }).session(session).lean();
   const { items, quantities, subtotalPaise } = calculateItems(checkout.items, products);
-  let discountPaise = 0;
-
-  if (checkout.couponCode) {
-    const user = await User.findById(userId).session(session).lean();
-    if (!user) throw new UnauthorizedError("Please sign in again.");
-    if (!user.welcomeCouponIssuedAt || user.welcomeCouponCode !== checkout.couponCode || user.welcomeCouponUsedAt) {
-      throw new ConflictError("This welcome coupon is unavailable for your account.");
-    }
-    const previousOrder = await Payment.exists({
-      userId, couponCode: { $in: [checkout.couponCode, "FIRST11"] },
-      status: { $in: ["pending", "paid", "refunded"] },
-    }).session(session);
-    if (previousOrder) throw new ConflictError("Your welcome coupon has already been used.");
-    discountPaise = Math.round(subtotalPaise / 10);
-  }
 
   return {
     quantities,
@@ -113,12 +93,11 @@ async function buildQuote(userId, checkout, session = null) {
       items,
       shippingAddress: checkout.shippingAddress,
       paymentMethod: "cod",
-      couponCode: checkout.couponCode,
       subtotal: subtotalPaise / 100,
-      discountAmount: discountPaise / 100,
+      discountAmount: 0,
       deliveryCharge: 0,
-      totalAmount: (subtotalPaise - discountPaise) / 100,
-      totalPaise: subtotalPaise - discountPaise,
+      totalAmount: subtotalPaise / 100,
+      totalPaise: subtotalPaise,
       currency: "INR",
     },
   };
@@ -160,13 +139,6 @@ async function placeCodOrder(userId, body) {
         );
         if (stockUpdate.modifiedCount !== 1) throw new ConflictError("Stock has changed. Update your bag.");
       }
-      if (checkout.couponCode) {
-        const claim = await User.updateOne(
-          { _id: userId, welcomeCouponCode: checkout.couponCode, welcomeCouponUsedAt: null },
-          { $set: { welcomeCouponUsedAt: new Date() } }, { session },
-        );
-        if (claim.modifiedCount !== 1) throw new ConflictError("Your welcome coupon has already been used.");
-      }
       const [payment] = await Payment.create([{
         userId,
         productId: [...quantities.keys()],
@@ -178,7 +150,6 @@ async function placeCodOrder(userId, body) {
         subtotal: quote.subtotal,
         discountAmount: quote.discountAmount,
         totalAmount: quote.totalAmount,
-        ...(checkout.couponCode ? { couponCode: checkout.couponCode } : {}),
         requestId: body.requestId,
         requestFingerprint,
       }], { session });
@@ -188,7 +159,7 @@ async function placeCodOrder(userId, body) {
     if (error.code === 11000) {
       const previous = await Payment.findOne({ userId, requestId: body.requestId }).lean();
       if (previous) return verifyRetry(previous);
-      throw new ConflictError("This coupon has already been used on another order.");
+      throw new ConflictError("This order request was already used. Please review your order.");
     }
     throw error;
   }

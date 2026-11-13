@@ -9,6 +9,7 @@ const {
   resetPassword,
 } = require("../controllers/user.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
+const { trustedOrigin } = require("../middlewares/origin.middleware");
 const { apiLimiter } = require("../middlewares/rateLimiter.middleware");
 const {
   recoveryLimiter,
@@ -18,8 +19,8 @@ const {
 router
   .get("/profile", authMiddleware, getUserProfile)
   .post("/forgot-password", recoveryLimiter, forgotPassword)
-  .post("/verify-otp", recoveryLimiter, verifyOtp)
-  .post("/reset-password", recoveryLimiter, resetPassword)
-  .put("/update-profile", authMiddleware, updateProfile)
-  .delete("/account", authMiddleware, apiLimiter, deleteAccount);
+  .post("/verify-otp", trustedOrigin, recoveryLimiter, verifyOtp)
+  .post("/reset-password", trustedOrigin, recoveryLimiter, resetPassword)
+  .put("/update-profile", authMiddleware, trustedOrigin, updateProfile)
+  .delete("/account", authMiddleware, trustedOrigin, apiLimiter, deleteAccount);
 module.exports = router;

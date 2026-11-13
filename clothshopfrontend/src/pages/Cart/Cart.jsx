@@ -1,5 +1,4 @@
 import ErrorAlert from "../../components/common/ErrorAlert";
-import { useGetWelcomeCouponQuery } from "../../redux/coupons/couponApi";
 import {
   ActionIcon,
   Alert,
@@ -49,13 +48,6 @@ export default function Cart({ checkout = false }) {
   const dispatch = useDispatch(),
     navigate = useNavigate();
   const [params] = useSearchParams();
-  const userId = localStorage.getItem("userId");
-  const { data: couponData, isFetching: checkingCoupon, isError: couponError, refetch: retryCoupon } = useGetWelcomeCouponQuery(undefined, {
-    skip: !userId,
-    refetchOnMountOrArgChange: true,
-    pollingInterval: 30000,
-  });
-  const coupon = couponData?.data;
   const cart = useSelector((state) => state.cart);
   const buyNow = checkout && params.get("mode") === "buy-now";
   const items = buyNow ? (cart.buyNow ? [cart.buyNow] : []) : cart.items;
@@ -116,21 +108,6 @@ export default function Cart({ checkout = false }) {
       0,
     ) / 100;
   const canContinue = checked && !issues && items.length > 0;
-  const couponApplied = Boolean(
-    params.get("coupon") === coupon?.code &&
-    coupon?.status === "available" &&
-    !checkingCoupon && !couponError && canContinue,
-  );
-  const discount = couponApplied
-    ? Math.round(subtotal * coupon.percent) / 100
-    : 0;
-
-  function toggleWelcomeCoupon() {
-    const nextParams = new URLSearchParams(params);
-    if (couponApplied) nextParams.delete("coupon");
-    else nextParams.set("coupon", coupon.code);
-    navigate({ search: nextParams.toString() }, { replace: true, preventScrollReset: true });
-  }
   const needsLogin = error?.status === 401 || error?.status === 403;
   const updateQuantity = (line, next) => {
     if (!checked || line.stock === null) return;
@@ -416,41 +393,6 @@ export default function Cart({ checkout = false }) {
                   review. Items in your bag are not reserved.
                 </Text>
                 <Divider my="xl" />
-                {userId && couponError && (
-                  <Box mb="lg">
-                    <Text size="xs">Your coupon could not be checked.</Text>
-                    <Button variant="subtle" size="xs" onClick={retryCoupon}>Try again</Button>
-                  </Box>
-                )}
-                {coupon && (
-                  <Box mb="lg" p="md" style={{ border: "1px dashed var(--mantine-color-default-border)" }}>
-                    <Group justify="space-between" mb="xs">
-                      <Text size="sm" fw={600}>{coupon.code}</Text>
-                      <Badge color={coupon.status === "available" ? "green" : "gray"}>
-                        {coupon.status === "used" ? "Used" : coupon.status === "reserved" ? "In use" : "10% off"}
-                      </Badge>
-                    </Group>
-                    <Text size="xs" c="dimmed" mb="sm">Your welcome gift. One use per account.</Text>
-                    <Button fullWidth variant="default" size="xs"
-                      disabled={coupon.status !== "available" || !canContinue || checkingCoupon || couponError}
-                      onClick={toggleWelcomeCoupon}>
-                      {coupon.status === "used" ? "Already used" : coupon.status === "reserved" ? "In use on an order" : couponApplied ? "Remove coupon" : "Apply welcome coupon"}
-                    </Button>
-                  </Box>
-                )}
-                {couponApplied && (
-                  <Box mb="lg" aria-live="polite">
-                    <Group justify="space-between" mb="sm">
-                      <Text size="sm">Welcome discount (10%)</Text>
-                      <Text size="sm" c="green">-{money(discount)}</Text>
-                    </Group>
-                    <Group justify="space-between">
-                      <Text size="sm" fw={600}>Estimated total</Text>
-                      <Text fw={600}>{money(subtotal - discount)}</Text>
-                    </Group>
-                    <Text size="xs" c="dimmed" mt="sm">Discount preview. Your coupon stays available until an order is completed.</Text>
-                  </Box>
-                )}
                 {isFetching ? (
                   <Badge color="gray" variant="light" mb="md">
                     Checking availability…
@@ -467,7 +409,7 @@ export default function Cart({ checkout = false }) {
                 ) : (
                   <Button
                     onClick={() => {
-                      if (canContinue) navigate(couponApplied ? `/checkout?coupon=${coupon.code}` : "/checkout");
+                      if (canContinue) navigate("/checkout");
                     }}
                     disabled={!canContinue}
                     loading={isFetching}

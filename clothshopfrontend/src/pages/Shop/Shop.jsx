@@ -56,7 +56,7 @@ export default function Shop({ collection = "all" }) {
   const [preview, setPreview] = useState(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const reducedMotion = useReducedMotion();
-  const { data, isLoading, isError, error, refetch } = useGetProductsQuery();
+  const { data, isLoading, isError, error, refetch } = useGetProductsQuery(undefined, { refetchOnMountOrArgChange: true });
   const products = Array.isArray(data?.data) ? data.data : [];
   const collectionProducts = products.filter((product) => !content.aliases || content.aliases.includes(product.category?.trim().toLowerCase()));
   const options = {

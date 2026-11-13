@@ -4,7 +4,7 @@ import UserAvatar from "../common/UserAvatar";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../../redux/auth/authApi";
-import { useGetNotificationsQuery } from "../../redux/notifications/notificationApi";
+import { notificationApi } from "../../redux/notifications/notificationApi";
 import { selectCartCount } from "../../redux/cart/cartSlice";
 import { selectWishlistCount } from "../../redux/wishlist/wishlistSlice";
 import { useMediaQuery } from "@mantine/hooks";
@@ -94,6 +94,8 @@ const accountLinks = [
   },
 ];
 
+const selectNotifications = notificationApi.endpoints.getNotifications.select();
+
 export default function Navbar({ colorScheme, toggleColorScheme }) {
   const cartCount = useSelector(selectCartCount);
   const wishlistCount = useSelector(selectWishlistCount);
@@ -109,12 +111,8 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const { data: notifications } = useGetNotificationsQuery(undefined, {
-    skip: !signedIn,
-    pollingInterval: 60000,
-    refetchOnMountOrArgChange: true,
-  });
-  const unreadCount = signedIn ? notifications?.unreadCount || 0 : 0;
+  const notifications = useSelector(selectNotifications);
+  const unreadCount = signedIn ? notifications.data?.data?.filter((item) => !item.readAt).length || 0 : 0;
   const { pathname } = useLocation();
   const theme = useMantineTheme();
   const desktop = useMediaQuery(`(min-width: ${theme.breakpoints.xl})`);

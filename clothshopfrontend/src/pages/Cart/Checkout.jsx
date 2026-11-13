@@ -9,7 +9,6 @@ import { CreditCard, PackageCheck, Truck } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearBuyNow, clearCart } from "../../redux/cart/cartSlice";
-import { useGetWelcomeCouponQuery } from "../../redux/coupons/couponApi";
 import { useGetProfileQuery } from "../../redux/auth/authApi";
 import { useGetCheckoutDetailsQuery, useQuoteCheckoutMutation, useCreateCodOrderMutation } from "../../redux/payments/paymentApi";
 
@@ -67,7 +66,6 @@ function OrderSummary({ quote }) {
   return (
     <Stack gap="sm">
       <Group justify="space-between"><Text>Subtotal</Text><Text>{money(quote.subtotal)}</Text></Group>
-      {quote.couponCode && <Group justify="space-between"><Text size="sm">Welcome discount</Text><Text c="green">-{money(quote.discountAmount)}</Text></Group>}
       <Group justify="space-between"><Text>Delivery</Text><Text c="green">Free</Text></Group>
       <Divider />
       <Group justify="space-between"><Text fw={600}>Pay on delivery</Text><Text size="xl" fw={600}>{money(quote.totalAmount)}</Text></Group>
@@ -89,7 +87,6 @@ export default function Checkout() {
     skip: !profile?.data?._id || !selectedItems.length,
     refetchOnMountOrArgChange: true,
   });
-  const [couponSelected, setCouponSelected] = useState(Boolean(params.get("coupon")));
   const [error, setError] = useState("");
   const [quote, setQuote] = useState(null);
   const [confirmedOrder, setConfirmedOrder] = useState(null);
@@ -97,8 +94,6 @@ export default function Checkout() {
   const [createCodOrder, { isLoading: isPlacing }] = useCreateCodOrderMutation();
   const submission = useRef(null);
   const submissionLock = useRef(false);
-  const { data: couponData } = useGetWelcomeCouponQuery(undefined, { refetchOnMountOrArgChange: true });
-  const coupon = couponData?.data;
   const busy = isQuoting || isPlacing;
 
   const editedFields = useRef(new Set());
@@ -128,7 +123,6 @@ export default function Checkout() {
       items: selectedItems.map(({ productId, quantity, color, size }) => ({ productId, quantity, color, size })),
       shippingAddress: address,
       paymentMethod: "cod",
-      couponCode: couponSelected && coupon?.status === "available" ? coupon.code : "",
     };
     try {
       const response = await quoteCheckout(checkout).unwrap();
@@ -137,7 +131,6 @@ export default function Checkout() {
       // Keep the same request ID when reviewing an unchanged order after a retry.
       const unchanged = previous && JSON.stringify(previous.items) === JSON.stringify(checkout.items)
         && JSON.stringify(previous.shippingAddress) === JSON.stringify(checkout.shippingAddress)
-        && previous.couponCode === checkout.couponCode
         && previous.expectedTotalPaise === response.data.totalPaise;
       submission.current = {
         ...checkout,
@@ -213,16 +206,6 @@ export default function Checkout() {
         <Stack mt={36} maw={760} gap="xl">
           <Title order={2} size={24} fw={500}>Payment method</Title>
           <PaymentOptions />
-          {coupon && (
-            <Box p="lg" style={{ border: "1px dashed var(--mantine-color-default-border)", borderRadius: 8 }}>
-              <Group justify="space-between">
-                <Box><Text fw={500}>{coupon.code}</Text><Text size="sm" c="dimmed">10% welcome discount</Text></Box>
-                <Button variant="default" disabled={coupon.status !== "available" || busy} onClick={() => setCouponSelected(!couponSelected)}>
-                  {coupon.status !== "available" ? "Unavailable" : couponSelected ? "Remove coupon" : "Apply coupon"}
-                </Button>
-              </Group>
-            </Box>
-          )}
           <Group><Button variant="default" disabled={busy} onClick={() => setActiveStep(0)}>Back</Button><Button onClick={reviewOrder} loading={isQuoting}>Review order</Button></Group>
         </Stack>
       )}
@@ -268,7 +251,6 @@ export default function Checkout() {
           <Title order={2} fw={500}>Your order is confirmed</Title>
           <Text c="dimmed">Reference #{confirmedOrder._id.slice(-8).toUpperCase()}</Text>
           <Text>Pay {money(confirmedOrder.totalAmount)} when your order arrives.</Text>
-          {confirmedOrder.couponCode && <Badge color="green">Welcome coupon used</Badge>}
           <Group><Button component={Link} to="/profile?section=orders" variant="default">View order history</Button><Button component={Link} to="/shop">Continue shopping</Button></Group>
         </Stack>
       )}

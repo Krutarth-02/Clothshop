@@ -366,7 +366,7 @@ export default function ProductDetails() {
   const { id } = useParams();
   const validId = /^[a-f\d]{24}$/i.test(id || "");
   const { currentData, isFetching, isError, error, refetch } =
-    useGetProductByIdQuery(id, { skip: !validId });
+    useGetProductByIdQuery(id, { skip: !validId, refetchOnMountOrArgChange: true });
   const product = currentData?.data;
   const needsLogin = error?.status === 401 || error?.status === 403;
   const loading = validId && isFetching && !product;

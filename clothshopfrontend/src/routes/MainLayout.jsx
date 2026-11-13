@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 import Footer from "../components/layout/Footer";
 import Navbar from "../components/layout/Navbar";
-import WelcomeCoupon from "../components/common/WelcomeCoupon";
 
 const MainLayout = ({ colorScheme, toggleColorScheme }) => {
   const { pathname } = useLocation();
@@ -17,7 +16,6 @@ const MainLayout = ({ colorScheme, toggleColorScheme }) => {
       <Outlet />
 
       <Footer />
-      <WelcomeCoupon />
     </>
   );
 };

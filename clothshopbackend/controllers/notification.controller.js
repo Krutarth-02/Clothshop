@@ -8,8 +8,8 @@ const getNotifications = async (req, res, next) => {
       .sort({ createdAt: -1, _id: -1 })
       .lean();
     res.json({ data });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 

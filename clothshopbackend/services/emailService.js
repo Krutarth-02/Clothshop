@@ -1,6 +1,7 @@
 // services/emailService.js
 
 const nodemailer = require("nodemailer");
+const { ServiceUnavailableError } = require("../utils/errors");
 
 const sendEmail = async (to, subject, otp) => {
   try {
@@ -32,29 +33,33 @@ const sendEmail = async (to, subject, otp) => {
 };
 
 const sendContactEmail = async ({ name, email, subject, message }) => {
-  const recipient = (process.env.CONTACT_EMAIL || process.env.EMAIL_USER || "").trim();
-  const sender = (process.env.EMAIL_USER || "").trim();
-  const validEmail = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
-  if (!validEmail.test(recipient) || !validEmail.test(sender) || !process.env.EMAIL_PASS) {
-    throw new Error("Contact email is not configured.");
+  try {
+    const recipient = (process.env.CONTACT_EMAIL || process.env.EMAIL_USER || "").trim();
+    const sender = (process.env.EMAIL_USER || "").trim();
+    const validEmail = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+    if (!validEmail.test(recipient) || !validEmail.test(sender) || !process.env.EMAIL_PASS) {
+      throw new Error("Contact email is not configured.");
+    }
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: sender, pass: process.env.EMAIL_PASS },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
+    const result = await transporter.sendMail({
+      from: { name: "HIFASHOPNHUB Contact", address: sender },
+      to: recipient,
+      replyTo: { name, address: email },
+      subject: `[HIFASHOPNHUB] ${subject}`,
+      text: `New customer message\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\n\n${message}\n\nSent through the HIFASHOPNHUB Contact Us form.`,
+      disableFileAccess: true,
+      disableUrlAccess: true,
+    });
+    if (!result.accepted?.length) throw new Error("Contact email was not accepted.");
+  } catch {
+    throw new ServiceUnavailableError("Your message could not be sent right now. Please try again shortly.");
   }
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: sender, pass: process.env.EMAIL_PASS },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-  });
-  const result = await transporter.sendMail({
-    from: { name: "HIFASHOPNHUB Contact", address: sender },
-    to: recipient,
-    replyTo: { name, address: email },
-    subject: `[HIFASHOPNHUB] ${subject}`,
-    text: `New customer message\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\n\n${message}\n\nSent through the HIFASHOPNHUB Contact Us form.`,
-    disableFileAccess: true,
-    disableUrlAccess: true,
-  });
-  if (!result.accepted?.length) throw new Error("Contact email was not accepted.");
 };
 
 module.exports = { sendEmail, sendContactEmail };

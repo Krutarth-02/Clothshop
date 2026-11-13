@@ -12,7 +12,7 @@ const {
 
 let googleKeyCache = { keys: [], expiresAt: 0 };
 
-async function providerRequest(url, headers = {}) {
+const providerRequest = async (url, headers = {}) => {
   try {
     const response = await fetch(url, {
       headers,
@@ -30,9 +30,9 @@ async function providerRequest(url, headers = {}) {
       "Sign-in provider is unavailable. Please try again.",
     );
   }
-}
+};
 
-async function verifyGoogleLogin(credential) {
+const verifyGoogleLogin = async (credential) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId)
     throw new ServiceUnavailableError("Google sign-in is not configured.");
@@ -95,9 +95,9 @@ async function verifyGoogleLogin(credential) {
     authoritative:
       Boolean(identity.hd) || identity.email?.endsWith("@gmail.com"),
   };
-}
+};
 
-async function verifyFacebookLogin(accessToken) {
+const verifyFacebookLogin = async (accessToken) => {
   const appId = process.env.FACEBOOK_APP_ID;
   const appSecret = process.env.FACEBOOK_APP_SECRET;
   if (!appId || !appSecret)
@@ -145,21 +145,23 @@ async function verifyFacebookLogin(accessToken) {
     picture: profile.picture?.data?.url,
     authoritative: false,
   };
-}
+};
 
 const LoginUser = async (req, res, next) => {
-  const {
-    email,
-    password,
-    rememberMe,
-    googleAuth,
-    facebookAuth,
-    credential,
-    accessToken,
-    accountPassword,
-  } = req.body || {};
   try {
+    const {
+      email,
+      password,
+      rememberMe,
+      googleAuth,
+      facebookAuth,
+      credential,
+      accessToken,
+      accountPassword,
+    } = req.body || {};
     let user;
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)
+      return next(new ServiceUnavailableError("Server sign-in is not configured. Contact the store owner."));
     if (googleAuth === true || facebookAuth === true) {
       if (googleAuth === true && facebookAuth === true)
         return next(new BadRequestError("Choose one sign-in provider."));
@@ -260,7 +262,9 @@ const LoginUser = async (req, res, next) => {
         !password
       )
         return next(new BadRequestError("Email and password are required."));
-      user = await User.findOne({ email });
+      if (email.length > 254 || Buffer.byteLength(password, "utf8") > 72)
+        return next(new BadRequestError("Enter valid login details."));
+      user = await User.findOne({ email: email.trim() }).collation({ locale: "en", strength: 2 }).select("+sessionVersion");
       if (
         !user ||
         !user.password ||
@@ -272,7 +276,12 @@ const LoginUser = async (req, res, next) => {
           ),
         );
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    if (user.status === "suspended")
+      return next(new UnauthorizedError("Invalid credentials or account unavailable."));
+    // Social accounts may also have had earlier sessions revoked.
+    const sessionUser = await User.findById(user._id).select("+sessionVersion");
+    if (!sessionUser) return next(new UnauthorizedError("Account no longer exists"));
+    const token = jwt.sign({ userId: user._id, version: sessionUser.sessionVersion || 0 }, process.env.JWT_SECRET, {
       expiresIn: rememberMe ? "15d" : "7d",
     });
 
@@ -284,12 +293,13 @@ const LoginUser = async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: rememberMe ? 15 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 15 days or 7 days
+      maxAge: rememberMe ? 15 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000,
     });
 
     const safeUser = user.toObject();
     for (const field of [
       "password",
+      "sessionVersion",
       "otp",
       "otpExpiry",
       "otpAttempts",
@@ -301,22 +311,26 @@ const LoginUser = async (req, res, next) => {
     return res
       .status(200)
       .json({ message: "Login successful", data: safeUser, token });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
 const SignupUser = async (req, res, next) => {
-  const { fullName, email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const { fullName, email, password } = req.body || {};
+    if (typeof fullName !== "string" || !fullName.trim() || fullName.length > 200 ||
+      typeof email !== "string" || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72)
+      return next(new BadRequestError("Enter a name, valid email and password of 8 to 72 bytes."));
+    const user = await User.findOne({ email: email.trim() }).collation({ locale: "en", strength: 2 });
     if (user) {
       return next(new ForbiddenError("User already exists"));
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       fullName,
-      email,
+      email: email.trim().toLowerCase(),
       password: hashedPassword,
       role: "user",
     });
@@ -328,14 +342,18 @@ const SignupUser = async (req, res, next) => {
   }
 };
 
-const LogoutUser = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    path: "/",
-  });
-  res.status(200).json({ message: "Logout successful" });
+const LogoutUser = async (req, res, next) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    });
+    res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
+    next(err);
+  }
 };
 module.exports = {
   LoginUser,

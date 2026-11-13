@@ -122,7 +122,7 @@ export default function Home() {
   };
   const [preview, setPreview] = useState(null);
   const [search, setSearch] = useState("");
-  const { data, isLoading, isError, error, refetch } = useGetProductsQuery();
+  const { data, isLoading, isError, error, refetch } = useGetProductsQuery(undefined, { refetchOnMountOrArgChange: true });
   const location = useLocation();
   const reducedMotion = useReducedMotion();
   const products = Array.isArray(data?.data) ? data.data : [];

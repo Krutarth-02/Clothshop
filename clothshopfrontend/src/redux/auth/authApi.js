@@ -1,4 +1,5 @@
 ﻿import { api } from "../api/api";
+import { handleUpdateProfile } from "./auth.dispacher";
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -29,7 +30,9 @@ export const authApi = api.injectEndpoints({
     }),
     updateProfile: builder.mutation({
       query: (body) => ({ url: "/user/update-profile", method: "PUT", body }),
-      invalidatesTags: (result, error) => (error ? [] : ["Profile"]),
+      async onQueryStarted(arg, toolkitApi) {
+        await handleUpdateProfile(arg, toolkitApi);
+      },
     }),
     deleteAccount: builder.mutation({
       query: (body) => ({ url: "/user/account", method: "DELETE", body }),
