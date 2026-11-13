@@ -28,7 +28,7 @@ const getUserProfile = async (req, res, next) => {
 const forgotPassword = async (req, res, next) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ email, role: "user" });
+  const user = await User.findOne({ email });
   if (!user) {
     return next(new NotFoundError("User not found"));
   }
@@ -51,7 +51,7 @@ const verifyOtp = async (req, res, next) => {
     const { email, otp } = req.body;
 
     // 1. Check user
-    const user = await User.findOne({ email, role: "user" });
+    const user = await User.findOne({ email });
     if (!user) {
       return next(new NotFoundError("User not found"));
     }
@@ -82,7 +82,7 @@ const resetPassword = async (req, res, next) => {
       return next(new BadRequestError("All fields required"));
     }
 
-    const user = await User.findOne({ email, role: "user" });
+    const user = await User.findOne({ email });
     if (!user) {
       return next(new NotFoundError("User not found"));
     }
@@ -117,7 +117,6 @@ const updateProfile = async (req, res, next) => {
     const user = await User.findById(req.user.userId);
     if (!user)
       return next(new UnauthorizedError("Session user no longer exists"));
-    if (user.role !== "user") return next(new ForbiddenError("Manage staff accounts through the admin workspace."));
     const updateData = {};
     // Account roles and login history are server-managed.
     for (const field of [
@@ -154,8 +153,8 @@ const updateProfile = async (req, res, next) => {
       updateData.password = await bcrypt.hash(req.body.password, salt);
     }
 
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: req.user.userId, role: "user" },
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
       updateData,
       {
         new: true,
@@ -186,13 +185,11 @@ const deleteAccount = async (req, res, next) => {
       );
     const user = await User.findById(req.user.userId);
     if (!user) return next(new UnauthorizedError("Account no longer exists"));
-    if (user.role !== "user") return next(new ForbiddenError("Staff accounts must be managed through the admin workspace."));
     if (!user.password || !(await bcrypt.compare(password, user.password)))
       return next(new BadRequestError("Current password is incorrect."));
     // Re-check the password at deletion time to avoid concurrent changes.
     const deleted = await User.findOneAndDelete({
       _id: user._id,
-      role: "user",
       password: user.password,
     });
     if (!deleted)

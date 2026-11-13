@@ -41,7 +41,6 @@ const PaymentSchema = new mongoose.Schema(
     discountAmount: { type: Number, min: 0, default: 0 },
     subtotal: { type: Number, min: 0 },
     orderStatus: { type: String, enum: ["confirmed" ] },
-    fulfillmentStatus: { type: String, enum: ["confirmed", "processing", "shipped", "delivered"], default: "confirmed" },
     requestId: { type: String },
     requestFingerprint: { type: String },
     shippingAddress: {
@@ -69,8 +68,6 @@ const PaymentSchema = new mongoose.Schema(
 );
 
 PaymentSchema.index({ userId: 1, createdAt: -1, _id: -1 });
-PaymentSchema.index({ status: 1, paidAt: -1 });
-PaymentSchema.index({ orderStatus: 1, createdAt: -1 });
 PaymentSchema.index({ userId: 1, requestId: 1 }, {
   name: "unique_checkout_request",
   unique: true,

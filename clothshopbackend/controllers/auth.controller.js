@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { recordSuccessfulLogin } = require("../services/loginActivity");
-const AdminActivity = require("../models/AdminActivity");
 const {
   BadRequestError,
   ServiceUnavailableError,
@@ -323,8 +322,6 @@ const SignupUser = async (req, res, next) => {
     });
 
     await newUser.save();
-    await AdminActivity.create({ userId: newUser._id, action: "ACCOUNT_CREATED", resource: "customers", status: 201 })
-      .catch(() => console.error("Registration activity could not be recorded."));
     res.status(201).json({ message: "Registered successfully" });
   } catch (err) {
     next(err);
