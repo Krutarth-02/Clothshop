@@ -1,6 +1,6 @@
 import { api, getCacheSession } from "../api/api";
 
-export async function handleUpdateProfile(profile, toolkitApi) {
+export const handleUpdateProfile = async (profile, toolkitApi) => {
   const { dispatch, queryFulfilled, getState } = toolkitApi;
   const session = getCacheSession(getState);
   const isCurrent = () => getCacheSession(getState) === session;
@@ -35,4 +35,4 @@ export async function handleUpdateProfile(profile, toolkitApi) {
   } catch {
     if (!saved && isCurrent()) for (const patch of patches.reverse()) patch.undo();
   }
-}
+};

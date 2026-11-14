@@ -18,7 +18,7 @@ import CommonModal from "../../components/common/Modal";
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const facebookAppId = import.meta.env.VITE_FACEBOOK_APP_ID;
 let facebookSdk;
-function loadFacebook() {
+const loadFacebook = () => {
   if (facebookSdk) return facebookSdk;
   facebookSdk = new Promise((resolve, reject) => {
     const init = () => {
@@ -37,7 +37,7 @@ function loadFacebook() {
     document.head.appendChild(script);
   }).catch((error) => { facebookSdk = undefined; throw error; });
   return facebookSdk;
-}
+};
 
 const Login = () => {
   const [login, { isLoading }] = useLoginMutation();

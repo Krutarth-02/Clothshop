@@ -3,7 +3,7 @@ import { CircleHelp, Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import ContactForm from "./ContactForm";
 
-export default function Contact() {
+const Contact = () => {
   const email = import.meta.env.VITE_SUPPORT_EMAIL;
   const phone = import.meta.env.VITE_SUPPORT_PHONE;
   return <Container component="main" py={{ base: 28, md: 48 }} mih="65vh">
@@ -22,4 +22,6 @@ export default function Contact() {
       <Grid.Col span={{ base: 12, md: 8 }}><ContactForm /></Grid.Col>
     </Grid>
   </Container>;
-}
+};
+
+export default Contact;

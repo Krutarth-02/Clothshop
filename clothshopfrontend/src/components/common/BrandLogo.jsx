@@ -1,6 +1,6 @@
 import { Group, Image, Stack, Text } from "@mantine/core";
 
-export default function BrandLogo({ iconSize = { base: 34, sm: 40 }, showTagline = true, ...props }) {
+const BrandLogo = ({ iconSize = { base: 34, sm: 40 }, showTagline = true, ...props }) => {
   return (
     <Group gap={10} wrap="nowrap" aria-hidden="true" {...props}>
       <Image
@@ -30,4 +30,6 @@ export default function BrandLogo({ iconSize = { base: 34, sm: 40 }, showTagline
       </Stack>
     </Group>
   );
-}
+};
+
+export default BrandLogo;

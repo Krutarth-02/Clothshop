@@ -5,7 +5,7 @@ import { useLogoutMutation } from "../redux/auth/authApi";
 import { api } from "../redux/api/api";
 import { clearCart, clearBuyNow } from "../redux/cart/cartSlice";
 
-export default function useAccountActions() {
+const useAccountActions = () => {
   const [logout, { isLoading: signingOut }] = useLogoutMutation();
   const dispatch = useDispatch(),
     navigate = useNavigate();
@@ -31,4 +31,6 @@ export default function useAccountActions() {
     }
   };
   return { signOut, signingOut, clearSession };
-}
+};
+
+export default useAccountActions;

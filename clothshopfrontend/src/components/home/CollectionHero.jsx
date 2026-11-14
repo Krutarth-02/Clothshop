@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import ScrollReveal from "../common/ScrollReveal";
 
-export default function CollectionHero({ collections }) {
+const CollectionHero = ({ collections }) => {
   const [selected, setSelected] = useState(0);
   const ref = useRef(null);
   const gesture = useRef(null);
@@ -285,4 +285,6 @@ export default function CollectionHero({ collections }) {
       </Container>
     </Box>
   );
-}
+};
+
+export default CollectionHero;

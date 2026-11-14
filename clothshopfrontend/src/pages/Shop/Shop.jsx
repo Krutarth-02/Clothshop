@@ -50,7 +50,7 @@ const pageSize = 12;
 const sizeOrder = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL", "4XL"];
 const distinct = (values) => [...new Map(values.filter(Boolean).map((value) => [value.toLowerCase(), value])).values()];
 
-export default function Shop({ collection = "all" }) {
+const Shop = ({ collection = "all" }) => {
   const content = collectionDetails[collection] || collectionDetails.all;
   const [searchParams, setSearchParams] = useSearchParams();
   const [preview, setPreview] = useState(null);
@@ -177,4 +177,6 @@ export default function Shop({ collection = "all" }) {
       <ProductPreview product={preview} onClose={() => setPreview(null)} />
     </Container>
   );
-}
+};
+
+export default Shop;

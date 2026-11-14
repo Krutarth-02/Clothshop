@@ -4,7 +4,7 @@ import { Box, Group, Image, Stack, Text, UnstyledButton } from "@mantine/core";
 import { useReducedMotion } from "@mantine/hooks";
 import { ArrowUpRight } from "lucide-react";
 
-export default function ProductCard({ product, onPreview, withBorder = false }) {
+const ProductCard = ({ product, onPreview, withBorder = false }) => {
   const [hovered, setHovered] = useState(false);
   const reducedMotion = useReducedMotion();
   return (
@@ -88,4 +88,6 @@ export default function ProductCard({ product, onPreview, withBorder = false }) 
       {product.unavailable && <Text pos="absolute" top={12} left={12} size="xs" bg="var(--mantine-color-body)" px="sm" py={6}>Unavailable</Text>}
     </Box>
   );
-}
+};
+
+export default ProductCard;

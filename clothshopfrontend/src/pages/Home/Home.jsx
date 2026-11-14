@@ -81,7 +81,7 @@ const buttonStyles = {
 };
 const filters = ["All", ...clothingCategories.map(({ label }) => label)];
 
-function SectionHeading({ label, title, children }) {
+const SectionHeading = ({ label, title, children }) => {
   return (
     <Group justify="space-between" align="end" mb={32} gap="lg">
       <Box>
@@ -101,9 +101,9 @@ function SectionHeading({ label, title, children }) {
       {children}
     </Group>
   );
-}
+};
 
-export default function Home() {
+const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category");
   const category = filters.includes(selectedCategory)
@@ -496,4 +496,6 @@ export default function Home() {
       <ProductPreview product={preview} onClose={() => setPreview(null)} />
     </Box>
   );
-}
+};
+
+export default Home;

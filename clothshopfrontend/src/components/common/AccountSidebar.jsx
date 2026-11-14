@@ -2,14 +2,14 @@ import { Box, Button, Divider, Paper, Stack, Text, Title } from "@mantine/core";
 import { LogOut } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 
-export default function AccountSidebar({
+const AccountSidebar = ({
   user,
   items,
   active,
   onSelect,
   onSignOut,
   signingOut,
-}) {
+}) => {
   return (
     <Paper
       component="aside"
@@ -66,4 +66,6 @@ export default function AccountSidebar({
       </Stack>
     </Paper>
   );
-}
+};
+
+export default AccountSidebar;

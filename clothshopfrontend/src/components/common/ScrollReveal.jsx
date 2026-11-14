@@ -3,13 +3,13 @@ import { Box } from "@mantine/core";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export default function ScrollReveal({
+const ScrollReveal = ({
   children,
   stagger = false,
   parallax = false,
   animationKey,
   ...props
-}) {
+}) => {
   const ref = useRef(null);
   const tweenRef = useRef(null);
 
@@ -72,4 +72,6 @@ export default function ScrollReveal({
       {children}
     </Box>
   );
-}
+};
+
+export default ScrollReveal;

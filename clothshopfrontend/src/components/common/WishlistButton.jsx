@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { selectWishlistItems, toggleWishlist } from "../../redux/wishlist/wishlistSlice";
 
-export default function WishlistButton({ product, ...props }) {
+const WishlistButton = ({ product, ...props }) => {
   const dispatch = useDispatch();
   const saved = useSelector(selectWishlistItems).some((item) => item._id === product?._id);
   const label = `${saved ? "Remove" : "Save"} ${product?.name || "product"} ${saved ? "from" : "to"} wishlist`;
@@ -17,4 +17,6 @@ export default function WishlistButton({ product, ...props }) {
     }}>
     <Heart size={19} fill={saved ? "#e03131" : "none"} color={saved ? "#e03131" : "currentColor"} />
   </ActionIcon>;
-}
+};
+
+export default WishlistButton;

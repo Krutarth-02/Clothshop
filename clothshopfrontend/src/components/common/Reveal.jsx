@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Box } from "@mantine/core";
 import { useIntersection, useReducedMotion } from "@mantine/hooks";
 
-export default function Reveal({ children, ...props }) {
+const Reveal = ({ children, ...props }) => {
   const { ref, entry } = useIntersection({ threshold: 0.08 });
   const reducedMotion = useReducedMotion();
 
@@ -23,4 +23,6 @@ export default function Reveal({ children, ...props }) {
       {children}
     </Box>
   );
-}
+};
+
+export default Reveal;

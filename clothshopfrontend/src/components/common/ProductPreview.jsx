@@ -14,7 +14,7 @@ import ErrorAlert from "./ErrorAlert";
 const accent = "#263c35";
 const money = (price) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(price);
 
-function PreviewContent({ product, onClose, checking, verified, error, onRetry }) {
+const PreviewContent = ({ product, onClose, checking, verified, error, onRetry }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
@@ -107,9 +107,9 @@ function PreviewContent({ product, onClose, checking, verified, error, onRetry }
       </Group>
     </Stack>
   </Box>;
-}
+};
 
-export default function ProductPreview({ product, onClose }) {
+const ProductPreview = ({ product, onClose }) => {
   const { data, isFetching, error, refetch } = useGetProductByIdQuery(product?._id, { skip: !product?._id, refetchOnMountOrArgChange: true });
   const live = product && data?.data?._id === product._id ? data.data : product;
   return <CommonModal opened={Boolean(product)} onClose={onClose} centered size={460} radius={18} padding={0} withCloseButton={false} aria-label="Product preview"
@@ -117,4 +117,6 @@ export default function ProductPreview({ product, onClose }) {
     {product && <PreviewContent key={product._id} product={live} onClose={onClose} checking={isFetching}
       verified={Boolean(data?.data?._id === product._id && !isFetching && !error)} error={error} onRetry={refetch} />}
   </CommonModal>;
-}
+};
+
+export default ProductPreview;

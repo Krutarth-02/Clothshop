@@ -2,14 +2,14 @@ import { Anchor, Button, PasswordInput, TextInput } from "@mantine/core";
 import { Link } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 
-export function AuthField({
+export const AuthField = ({
   formik,
   name,
   label,
   password = false,
   icon,
   ...props
-}) {
+}) => {
   const Field = password ? PasswordInput : TextInput;
   return (
     <Field
@@ -28,9 +28,9 @@ export function AuthField({
       {...props}
     />
   );
-}
+};
 
-export function AuthSubmit(props) {
+export const AuthSubmit = (props) => {
   return (
     <Button
       fullWidth
@@ -41,13 +41,13 @@ export function AuthSubmit(props) {
       {...props}
     />
   );
-}
+};
 
-export function AuthBackLink({
+export const AuthBackLink = ({
   to = "/login",
   children = "Back to sign in",
   ...props
-}) {
+}) => {
   return (
     <Anchor
       component={Link}
@@ -61,9 +61,9 @@ export function AuthBackLink({
       {children}
     </Anchor>
   );
-}
+};
 
-export function RecoveryPrompt({ title, description, children }) {
+export const RecoveryPrompt = ({ title, description, children }) => {
   return (
     <AuthLayout title={title} description={description}>
       <AuthSubmit
@@ -80,4 +80,4 @@ export function RecoveryPrompt({ title, description, children }) {
       <AuthBackLink />
     </AuthLayout>
   );
-}
+};

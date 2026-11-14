@@ -38,7 +38,7 @@ import {
   productOptions,
 } from "../../components/product/productOptions";
 
-function SimilarProducts({ product }) {
+const SimilarProducts = ({ product }) => {
   const [preview, setPreview] = useState(null);
   const category = typeof product.category === "string" ? product.category.trim().toLowerCase() : "";
   const { data, isLoading, isFetching, isError, refetch } = useGetProductsQuery(undefined, { skip: !category });
@@ -71,9 +71,9 @@ function SimilarProducts({ product }) {
       : <Text size="sm" c="dimmed">More similar styles will appear here when available.</Text>}
     <ProductPreview product={preview} onClose={() => setPreview(null)} />
   </Box>;
-}
+};
 
-function ProductContent({ product }) {
+const ProductContent = ({ product }) => {
   const dispatch = useDispatch(),
     navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
@@ -360,9 +360,9 @@ function ProductContent({ product }) {
       </Grid.Col>
     </Grid>
   );
-}
+};
 
-export default function ProductDetails() {
+const ProductDetails = () => {
   const { id } = useParams();
   const validId = /^[a-f\d]{24}$/i.test(id || "");
   const { currentData, isFetching, isError, error, refetch } =
@@ -450,4 +450,6 @@ export default function ProductDetails() {
       ) : null}
     </Container>
   );
-}
+};
+
+export default ProductDetails;

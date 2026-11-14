@@ -7,7 +7,7 @@ import { useSendContactMessageMutation } from "../../redux/contact/contactApi";
 
 const emptyForm = { name: "", email: "", subject: "", message: "" };
 
-export default function ContactForm() {
+const ContactForm = () => {
   const [values, setValues] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
@@ -64,4 +64,6 @@ export default function ContactForm() {
       </form>
     </Stack>
   </Paper>;
-}
+};
+
+export default ContactForm;

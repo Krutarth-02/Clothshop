@@ -7,7 +7,7 @@ import { getSizeChart, suggestSize } from "./sizeRecommendation";
 
 const number = (value) => Number(value.toFixed(1)).toString();
 
-export default function SizeGuide({ product, onSelect }) {
+const SizeGuide = ({ product, onSelect }) => {
   const [opened, setOpened] = useState(false);
   const [unit, setUnit] = useState("cm");
   const [chest, setChest] = useState("");
@@ -64,4 +64,6 @@ export default function SizeGuide({ product, onSelect }) {
       </Stack>
     </CommonModal>
   </>;
-}
+};
+
+export default SizeGuide;

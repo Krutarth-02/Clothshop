@@ -15,7 +15,7 @@ import { useDeleteAccountMutation } from "../../redux/auth/authApi";
 import useAccountActions from "../../hooks/useAccountActions";
 import AccountRecoveryModal from "./AccountRecoveryModal";
 
-export default function DeleteAccountModal({ email, onClose }) {
+const DeleteAccountModal = ({ email, onClose }) => {
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
@@ -94,4 +94,6 @@ export default function DeleteAccountModal({ email, onClose }) {
         </Stack>
     </CommonModal>
   );
-}
+};
+
+export default DeleteAccountModal;

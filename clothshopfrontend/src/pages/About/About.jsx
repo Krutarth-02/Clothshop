@@ -15,7 +15,7 @@ import { ArrowUpRight, Layers, Sparkles, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import Reveal from "../../components/common/Reveal";
 
-export default function About() {
+const About = () => {
   return (
     <Box
       component="main"
@@ -167,4 +167,6 @@ export default function About() {
       </Box>
     </Box>
   );
-}
+};
+
+export default About;

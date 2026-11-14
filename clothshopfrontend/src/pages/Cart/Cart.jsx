@@ -44,7 +44,7 @@ const money = (value) =>
     maximumFractionDigits: 2,
   }).format(value);
 
-export default function Cart({ checkout = false }) {
+const Cart = ({ checkout = false }) => {
   const dispatch = useDispatch(),
     navigate = useNavigate();
   const [params] = useSearchParams();
@@ -446,4 +446,6 @@ export default function Cart({ checkout = false }) {
       )}
     </Container>
   );
-}
+};
+
+export default Cart;

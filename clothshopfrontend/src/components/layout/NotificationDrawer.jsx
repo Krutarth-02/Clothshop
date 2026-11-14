@@ -31,7 +31,7 @@ import {
   useDismissNotificationMutation,
 } from "../../redux/notifications/notificationApi";
 
-function relativeTime(value) {
+const relativeTime = (value) => {
   const elapsed = Math.max(0, Date.now() - new Date(value).getTime());
   const minutes = Math.floor(elapsed / 60000);
   if (minutes < 1) return "Just now";
@@ -41,7 +41,7 @@ function relativeTime(value) {
   if (hours < 24) return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
   const days = Math.floor(hours / 24);
   return `${days} ${days === 1 ? "day" : "days"} ago`;
-}
+};
 
 const NotificationDrawer = ({ open, handleClose }) => {
   const colorScheme = useComputedColorScheme("light");

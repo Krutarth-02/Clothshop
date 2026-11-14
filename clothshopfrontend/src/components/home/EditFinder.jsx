@@ -16,7 +16,7 @@ import { ArrowUpRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import ScrollReveal from "../common/ScrollReveal";
 
-export default function EditFinder({ collections }) {
+const EditFinder = ({ collections }) => {
   const [selected, setSelected] = useState(0);
   const [sort, setSort] = useState("newest");
   const current = collections[selected];
@@ -123,4 +123,6 @@ export default function EditFinder({ collections }) {
       </Container>
     </Box>
   );
-}
+};
+
+export default EditFinder;

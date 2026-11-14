@@ -6,7 +6,7 @@ import { productImages, productOptions } from "../../components/product/productO
 export const CART_STORAGE_KEY = "clothshop.cart.v1";
 export const itemKey = (id, color, size) => JSON.stringify([id, color, size]);
 
-export function validItem(item) {
+export const validItem = (item) => {
   return (
     item &&
     typeof item.productId === "string" &&
@@ -23,9 +23,9 @@ export function validItem(item) {
     Number.isInteger(item.stock) &&
     item.stock >= 0
   );
-}
+};
 
-export function readSavedCart() {
+export const readSavedCart = () => {
   try {
     if (typeof localStorage === "undefined") return { items: [], buyNow: null };
     const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY));
@@ -53,7 +53,7 @@ export function readSavedCart() {
   } catch {
     return { items: [], buyNow: null };
   }
-}
+};
 
 const cartSlice = createSlice({
   name: "cart",
@@ -131,7 +131,7 @@ export const cartReducer = cartSlice.reducer;
 export const selectCartCount = (state) =>
   state.cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
-export function createCartItem(product, color, size, quantity) {
+export const createCartItem = (product, color, size, quantity) => {
   if (typeof product.price !== "number" || !Number.isFinite(product.price))
     return null;
   const colors = productOptions(product.color),
@@ -154,7 +154,7 @@ export function createCartItem(product, color, size, quantity) {
   return validItem(item) && quantity <= product.stock
     ? { ...item, key: itemKey(item.productId, item.color, item.size) }
     : null;
-}
+};
 
 export const addToCart = (item) => (dispatch, getState) => {
   if (!validItem(item)) return false;

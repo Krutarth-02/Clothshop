@@ -44,7 +44,7 @@ const topicIcons = {
   "/faq": CircleHelp,
 };
 
-function MeasurementGuide() {
+const MeasurementGuide = () => {
   const [unit, setUnit] = useState("cm");
   const [measurement, setMeasurement] = useState("");
   const converted =
@@ -135,9 +135,9 @@ function MeasurementGuide() {
       </Paper>
     </Stack>
   );
-}
+};
 
-function Sitemap() {
+const Sitemap = () => {
   const groups = [
     {
       title: "Explore the collection",
@@ -187,9 +187,9 @@ function Sitemap() {
       ))}
     </SimpleGrid>
   );
-}
+};
 
-export default function GuidancePage({ page }) {
+const GuidancePage = ({ page }) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   useEffect(() => {
@@ -439,4 +439,6 @@ export default function GuidancePage({ page }) {
       </Container>
     </Box>
   );
-}
+};
+
+export default GuidancePage;

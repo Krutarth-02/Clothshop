@@ -25,7 +25,7 @@ const addressFields = [
   { name: "postalCode", label: "PIN code", autoComplete: "shipping postal-code", inputMode: "numeric", maxLength: 6 },
 ];
 
-function validateAddress(address) {
+const validateAddress = (address) => {
   const errors = {};
   for (const field of addressFields) {
     if (!address[field.name]?.trim()) errors[field.name] = `${field.label} is required.`;
@@ -33,9 +33,9 @@ function validateAddress(address) {
   if (!/^[6-9]\d{9}$/.test(address.phone)) errors.phone = "Enter a valid 10-digit Indian mobile number.";
   if (!/^[1-9]\d{5}$/.test(address.postalCode)) errors.postalCode = "Enter a valid 6-digit PIN code.";
   return errors;
-}
+};
 
-function PaymentOptions() {
+const PaymentOptions = () => {
   return (
     <Radio.Group value="cod" label="Choose how to pay" description="Pay when your order arrives." size="md">
       <Stack mt="lg" gap="md">
@@ -60,9 +60,9 @@ function PaymentOptions() {
       </Stack>
     </Radio.Group>
   );
-}
+};
 
-function OrderSummary({ quote }) {
+const OrderSummary = ({ quote }) => {
   return (
     <Stack gap="sm">
       <Group justify="space-between"><Text>Subtotal</Text><Text>{money(quote.subtotal)}</Text></Group>
@@ -72,9 +72,9 @@ function OrderSummary({ quote }) {
       <Text size="xs" c="dimmed">All amounts in INR. No payment is collected online.</Text>
     </Stack>
   );
-}
+};
 
-export default function Checkout() {
+const Checkout = () => {
   const dispatch = useDispatch();
   const [params] = useSearchParams();
   const compact = useMediaQuery("(max-width: 48em)");
@@ -116,7 +116,7 @@ export default function Checkout() {
     ])), true);
   }, [details, setValues]);
 
-  async function reviewOrder() {
+  const reviewOrder = async () => {
     if (busy || submissionLock.current) return;
     setError("");
     const checkout = {
@@ -141,9 +141,9 @@ export default function Checkout() {
     } catch (failure) {
       setError(failure?.data?.message || "Could not check your order. Please try again.");
     }
-  }
+  };
 
-  async function placeOrder() {
+  const placeOrder = async () => {
     if (busy || submissionLock.current || !submission.current) return;
     submissionLock.current = true;
     setError("");
@@ -158,7 +158,7 @@ export default function Checkout() {
     } finally {
       submissionLock.current = false;
     }
-  }
+  };
 
   if (!selectedItems.length && !confirmedOrder) {
     return <Container py={70}><Stack align="center"><Title order={1} size={30}>Your bag is empty</Title><Button component={Link} to="/shop">Explore the collection</Button></Stack></Container>;
@@ -256,4 +256,6 @@ export default function Checkout() {
       )}
     </Container>
   );
-}
+};
+
+export default Checkout;

@@ -23,7 +23,7 @@ import Contact from "./pages/Contact/Contact";
 import GuidancePage from "./pages/Guidance/GuidancePage";
 import { guidancePages } from "./data/guidance";
 
-function App() {
+const App = () => {
   const [colorScheme, setColorScheme] = React.useState(
     localStorage.getItem("theme"),
   );
@@ -90,6 +90,6 @@ function App() {
       </BrowserRouter>
     </MantineProvider>
   );
-}
+};
 
 export default App;

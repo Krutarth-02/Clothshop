@@ -29,7 +29,7 @@ import {
 import DeleteAccountModal from "../../components/common/DeleteAccountModal";
 import useAccountActions from "../../hooks/useAccountActions";
 
-function ProfileContent({ user }) {
+const ProfileContent = ({ user }) => {
   const [params, setParams] = useSearchParams();
   const activeSection =
     params.get("section") === "orders" ? "orders" : "account";
@@ -212,9 +212,9 @@ function ProfileContent({ user }) {
       )}
     </>
   );
-}
+};
 
-export default function Profile() {
+const Profile = () => {
   const { data, error, refetch } = useGetProfileQuery();
   return (
     <Container component="main" py={{ base: 32, md: 56 }} mih="65vh">
@@ -233,4 +233,6 @@ export default function Profile() {
       )}
     </Container>
   );
-}
+};
+
+export default Profile;

@@ -12,7 +12,7 @@ import { useReducedMotion } from "@mantine/hooks";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function CollectionCard({ collection, index }) {
+const CollectionCard = ({ collection, index }) => {
   const [active, setActive] = useState(false);
   const reducedMotion = useReducedMotion();
   return (
@@ -89,4 +89,6 @@ export default function CollectionCard({ collection, index }) {
       </Box>
     </UnstyledButton>
   );
-}
+};
+
+export default CollectionCard;

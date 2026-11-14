@@ -96,7 +96,7 @@ const accountLinks = [
 
 const selectNotifications = notificationApi.endpoints.getNotifications.select();
 
-export default function Navbar({ colorScheme, toggleColorScheme }) {
+const Navbar = ({ colorScheme, toggleColorScheme }) => {
   const cartCount = useSelector(selectCartCount);
   const wishlistCount = useSelector(selectWishlistCount);
   const signedIn = Boolean(localStorage.getItem("userId"));
@@ -463,4 +463,6 @@ export default function Navbar({ colorScheme, toggleColorScheme }) {
       </CommonDrawer>
     </>
   );
-}
+};
+
+export default Navbar;

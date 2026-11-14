@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import BrandLogo from "../common/BrandLogo";
 import { footerGroups } from "../../data/guidance";
 
-export default function Footer() {
+const Footer = () => {
   const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL;
   return (
     <Box component="footer" pt={{ base: 32, md: 44 }} pb={20} style={{ background: "#18201c", color: "#edf0e9" }}>
@@ -49,4 +49,6 @@ export default function Footer() {
       </Container>
     </Box>
   );
-}
+};
+
+export default Footer;

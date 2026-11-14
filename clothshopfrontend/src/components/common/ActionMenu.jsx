@@ -1,7 +1,7 @@
 import { Button, Menu } from "@mantine/core";
 import { Link } from "react-router-dom";
 
-export function ActionMenuItems({ items = [], disabled = false, mobile = false, onAction }) {
+export const ActionMenuItems = ({ items = [], disabled = false, mobile = false, onAction }) => {
   const Item = mobile ? Button : Menu.Item;
   return items.map(({ key, label, icon, to, action, danger, disabled: itemDisabled, ...props }) => (
     <Item key={key || label} {...(to ? { component: Link, to } : {})}
@@ -20,9 +20,9 @@ export function ActionMenuItems({ items = [], disabled = false, mobile = false, 
       {label}
     </Item>
   ));
-}
+};
 
-export default function ActionMenu({ target, items, label, disabled, onAction, ...props }) {
+const ActionMenu = ({ target, items, label, disabled, onAction, ...props }) => {
   return <Menu position="bottom-end" withinPortal shadow="md" {...props}>
     <Menu.Target>{target}</Menu.Target>
     <Menu.Dropdown>
@@ -30,4 +30,6 @@ export default function ActionMenu({ target, items, label, disabled, onAction, .
       <ActionMenuItems items={items} disabled={disabled} onAction={onAction} />
     </Menu.Dropdown>
   </Menu>;
-}
+};
+
+export default ActionMenu;

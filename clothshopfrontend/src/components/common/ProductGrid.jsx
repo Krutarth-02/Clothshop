@@ -2,7 +2,7 @@ import { Box, SimpleGrid, Skeleton } from "@mantine/core";
 import ProductCard from "./ProductCard";
 import ScrollReveal from "./ScrollReveal";
 
-export default function ProductGrid({
+const ProductGrid = ({
   products = [],
   loading = false,
   placeholderCount = 4,
@@ -10,7 +10,7 @@ export default function ProductGrid({
   animate = false,
   cardProps,
   ...props
-}) {
+}) => {
   const Root = animate ? ScrollReveal : SimpleGrid;
   return (
     <Root
@@ -40,4 +40,6 @@ export default function ProductGrid({
           ))}
     </Root>
   );
-}
+};
+
+export default ProductGrid;

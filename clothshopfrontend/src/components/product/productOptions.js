@@ -1,4 +1,4 @@
-export function productOptions(value) {
+export const productOptions = (value) => {
   if (typeof value === "string") {
     try {
       value = JSON.parse(value);
@@ -13,10 +13,10 @@ export function productOptions(value) {
         .map((item) => item.trim()),
     ),
   ];
-}
+};
 
 // Keep product photos tied to colour names, never to the swatch's array index.
-export function productImages(product, color) {
+export const productImages = (product, color) => {
   const selected = String(color || "").trim().toLowerCase();
   const variant = Array.isArray(product.colorImages)
     ? product.colorImages.find((item) => String(item?.color || "").trim().toLowerCase() === selected)
@@ -31,7 +31,7 @@ export function productImages(product, color) {
     images: urls([product.image, ...(Array.isArray(product.images) ? product.images : [])]),
     matchesColor: false,
   };
-}
+};
 
 const shades = {
   white: "#f5f3ed",
@@ -74,7 +74,7 @@ const shades = {
   peach: "#e7b79a",
 };
 
-export function productColor(value) {
+export const productColor = (value) => {
   const name = String(value || "").trim();
   if (/^#(?:[\da-f]{3}|[\da-f]{6})$/i.test(name)) return name;
   return (
@@ -85,4 +85,4 @@ export function productColor(value) {
         .replace(/[\s_-]/g, "")
     ] || null
   );
-}
+};

@@ -1,6 +1,6 @@
 import { api, getCacheSession } from "../api/api";
 
-export async function handleCreateCodOrder(_values, toolkitApi) {
+export const handleCreateCodOrder = async (_values, toolkitApi) => {
   const { dispatch, queryFulfilled, getState } = toolkitApi;
   const session = getCacheSession(getState);
   const isCurrent = () => getCacheSession(getState) === session;
@@ -27,4 +27,4 @@ export async function handleCreateCodOrder(_values, toolkitApi) {
   } catch {
     // Failed checkout leaves cached orders and stock unchanged.
   }
-}
+};

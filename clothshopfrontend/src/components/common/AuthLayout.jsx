@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 import Reveal from "./Reveal";
 import BrandLogo from "./BrandLogo";
 
-export default function AuthLayout({ title, description, children, compact = false }) {
+const AuthLayout = ({ title, description, children, compact = false }) => {
   return (
     <Box
       component="main"
@@ -156,4 +156,6 @@ export default function AuthLayout({ title, description, children, compact = fal
       </Grid>
     </Box>
   );
-}
+};
+
+export default AuthLayout;

@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import LoadingState from "../components/common/Loader";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
-export default function PublicRoute() {
+const PublicRoute = () => {
   const signedIn = Boolean(localStorage.getItem("userId"));
   const { data, isLoading } = useGetProfileQuery(undefined, {
     skip: !signedIn,
@@ -16,4 +16,6 @@ export default function PublicRoute() {
       <Navigate to="/home" replace />
     );
   return <Outlet />;
-}
+};
+
+export default PublicRoute;

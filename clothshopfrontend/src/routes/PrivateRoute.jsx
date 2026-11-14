@@ -4,7 +4,7 @@ import LoadingState from "../components/common/Loader";
 import ErrorAlert from "../components/common/ErrorAlert";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
-export default function PrivateRoute() {
+const PrivateRoute = () => {
   const signedIn = Boolean(localStorage.getItem("userId"));
   const { data, isLoading, isFetching, error, refetch } = useGetProfileQuery(
     undefined,
@@ -29,4 +29,6 @@ export default function PrivateRoute() {
       </Center>
     );
   return <Outlet />;
-}
+};
+
+export default PrivateRoute;

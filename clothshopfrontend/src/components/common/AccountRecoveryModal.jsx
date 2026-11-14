@@ -14,7 +14,7 @@ import {
   useResetPasswordMutation,
 } from "../../redux/auth/authApi";
 
-export default function AccountRecoveryModal({ email, onClose, onRecovered }) {
+const AccountRecoveryModal = ({ email, onClose, onRecovered }) => {
   const [step, setStep] = useState("email");
   const [otp, setOtp] = useState("");
   const [resetToken, setResetToken] = useState("");
@@ -154,4 +154,6 @@ export default function AccountRecoveryModal({ email, onClose, onRecovered }) {
         </Stack>
     </CommonModal>
   );
-}
+};
+
+export default AccountRecoveryModal;

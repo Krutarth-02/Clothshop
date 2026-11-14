@@ -1,9 +1,9 @@
 import { api } from "../api/api";
 
-export async function handleGetProductById(
+export const handleGetProductById = async (
   id,
   { dispatch, queryFulfilled },
-) {
+) => {
   try {
     const { data: response } = await queryFulfilled;
     if (!response?.data || response.data._id !== id) return;
@@ -18,4 +18,4 @@ export async function handleGetProductById(
   } catch {
     // A failed read leaves the existing list unchanged; the query reports the error.
   }
-}
+};

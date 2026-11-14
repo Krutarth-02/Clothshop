@@ -9,7 +9,7 @@ import ProductGrid from "../../components/common/ProductGrid";
 import ProductPreview from "../../components/common/ProductPreview";
 import ErrorAlert from "../../components/common/ErrorAlert";
 
-export default function Wishlist() {
+const Wishlist = () => {
   const dispatch = useDispatch();
   const items = useSelector(selectWishlistItems);
   const [preview, setPreview] = useState(null);
@@ -33,4 +33,6 @@ export default function Wishlist() {
       : <ProductGrid products={savedProducts} onPreview={setPreview} cardProps={{ withBorder: true }} />}
     <ProductPreview product={preview} onClose={() => setPreview(null)} />
   </Container>;
-}
+};
+
+export default Wishlist;

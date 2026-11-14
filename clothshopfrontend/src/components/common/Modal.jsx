@@ -2,7 +2,7 @@ import { Modal as MantineModal } from "@mantine/core";
 import ErrorAlert from "./ErrorAlert";
 import FormActions from "./FormActions";
 
-export default function CommonModal({
+const CommonModal = ({
   opened = true,
   onClose,
   title,
@@ -16,7 +16,7 @@ export default function CommonModal({
   closeButtonProps,
   centered = true,
   ...props
-}) {
+}) => {
   const content = (
     <>
       <ErrorAlert message={error} mb="md" />
@@ -48,4 +48,6 @@ export default function CommonModal({
       }}>{content}</form> : content}
     </MantineModal>
   );
-}
+};
+
+export default CommonModal;

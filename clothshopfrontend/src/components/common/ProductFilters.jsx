@@ -3,7 +3,7 @@ import { RotateCcw, Search } from "lucide-react";
 
 const money = (value) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
 
-export default function ProductFilters({ values, options, priceLimit, disabled, onChange, onClear }) {
+const ProductFilters = ({ values, options, priceLimit, disabled, onChange, onClear }) => {
   return <Stack gap="lg">
     <Group justify="space-between"><Title order={2} size={19} fw={600}>Filters</Title><Text size="xs" c="dimmed">Refine your selection</Text></Group>
     <TextInput label="Search" placeholder="Find clothing..." value={values.q} disabled={disabled}
@@ -28,4 +28,6 @@ export default function ProductFilters({ values, options, priceLimit, disabled, 
       onChange={(event) => onChange("inStock", event.currentTarget.checked ? "true" : "")} color="dark" />
     <Button variant="default" fullWidth leftSection={<RotateCcw size={15} />} onClick={onClear}>Clear all</Button>
   </Stack>;
-}
+};
+
+export default ProductFilters;

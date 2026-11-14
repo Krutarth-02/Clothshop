@@ -6,7 +6,7 @@ import { useDebouncedValue, useFocusReturn, useFocusTrap } from "@mantine/hooks"
 import { useSearchProductsInfiniteQuery } from "../../redux/auth/productApi";
 import ErrorAlert from "../common/ErrorAlert";
 
-export default function ProductSearch({ onOpen, iconSize = 44 }) {
+const ProductSearch = ({ onOpen, iconSize = 44 }) => {
   const [opened, setOpened] = useState(false);
   const [query, setQuery] = useState("");
   const focusTrapRef = useFocusTrap(opened);
@@ -72,4 +72,6 @@ export default function ProductSearch({ onOpen, iconSize = 44 }) {
       </Box>
     </Box></Portal>}
   </>;
-}
+};
+
+export default ProductSearch;

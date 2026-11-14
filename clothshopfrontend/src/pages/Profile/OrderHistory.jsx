@@ -32,7 +32,7 @@ const statuses = {
   refunded: { label: "Refunded", color: "blue" },
 };
 
-export default function OrderHistory() {
+const OrderHistory = () => {
   const { data, isLoading, isFetching, error, refetch } = useGetPaymentsQuery(
     undefined,
     { refetchOnMountOrArgChange: true },
@@ -200,4 +200,6 @@ export default function OrderHistory() {
       )}
     </Stack>
   );
-}
+};
+
+export default OrderHistory;
