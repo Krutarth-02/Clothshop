@@ -9,18 +9,14 @@ const {
   resetPassword,
 } = require("../controllers/user.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
-const { trustedOrigin } = require("../middlewares/origin.middleware");
 const { apiLimiter } = require("../middlewares/rateLimiter.middleware");
-const {
-  recoveryLimiter,
-} = require("../middlewares/recoveryLimiter.middleware");
 
 // Get user profile
 router
   .get("/profile", authMiddleware, getUserProfile)
-  .post("/forgot-password", recoveryLimiter, forgotPassword)
-  .post("/verify-otp", trustedOrigin, recoveryLimiter, verifyOtp)
-  .post("/reset-password", trustedOrigin, recoveryLimiter, resetPassword)
-  .put("/update-profile", authMiddleware, trustedOrigin, updateProfile)
-  .delete("/account", authMiddleware, trustedOrigin, apiLimiter, deleteAccount);
+  .post("/forgot-password", forgotPassword)
+  .post("/verify-otp", verifyOtp)
+  .post("/reset-password", resetPassword)
+  .put("/update-profile", authMiddleware, updateProfile)
+  .delete("/account", authMiddleware, apiLimiter, deleteAccount);
 module.exports = router;

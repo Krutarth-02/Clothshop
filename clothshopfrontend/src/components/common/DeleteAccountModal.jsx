@@ -12,7 +12,6 @@ import {
 import { Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useDeleteAccountMutation } from "../../redux/auth/authApi";
-import useAccountActions from "../../hooks/useAccountActions";
 import AccountRecoveryModal from "./AccountRecoveryModal";
 
 const DeleteAccountModal = ({ email, onClose }) => {
@@ -21,7 +20,6 @@ const DeleteAccountModal = ({ email, onClose }) => {
   const [error, setError] = useState("");
   const [recovering, setRecovering] = useState(false);
   const [deleteAccount, { isLoading }] = useDeleteAccountMutation();
-  const { clearSession } = useAccountActions();
   const submit = async (event) => {
     event.preventDefault();
     if (isLoading || !password || confirmation !== "DELETE") return;
@@ -29,7 +27,7 @@ const DeleteAccountModal = ({ email, onClose }) => {
     try {
       await deleteAccount({ password, confirmation }).unwrap();
       onClose();
-      clearSession();
+      window.location.assign("/login");
       toast.success("Your account has been deleted");
     } catch (failure) {
       setError(

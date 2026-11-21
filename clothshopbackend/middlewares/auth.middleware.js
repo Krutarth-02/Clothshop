@@ -14,7 +14,7 @@ const authMiddleware = async (req, res, next) => {
   }
   try {
     // A deleted account must not keep access through an older valid JWT.
-    const user = await User.findById(decoded.userId).select("_id status +sessionVersion");
+    const user = await User.findById(decoded.userId).select("_id role status +sessionVersion");
     if (!user)
       return res.status(401).json({ message: "Account no longer exists" });
     if (user.status === "suspended" || (decoded.version || 0) !== (user.sessionVersion || 0))

@@ -19,32 +19,32 @@ const Register = () => {
     },
     validate: (values) => {
       const errors = {};
-      if (!values.fullName) {
+      if (!values.fullName.trim()) {
         errors.fullName = "Full name is required";
       }
       if (!values.email) {
         errors.email = "Email is required";
       } else if (
-        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email.trim())
       ) {
         errors.email = "Invalid email address";
       }
-      if (!values.phone) {
+      if (!values.phone.trim()) {
         errors.phone = "Phone number is required";
       }
-      if (!values.password) {
-        errors.password = "Password is required";
+      if (values.password.length < 8 || new TextEncoder().encode(values.password).length > 72) {
+        errors.password = "Use at least 8 characters and at most 72 bytes";
       }
       return errors;
     },
     onSubmit: async (values, action) => {
-      const res = await register(values).unwrap();
-      if (res.message) {
-        toast.success(res.message);
+      try {
+        const response = await register({ ...values, fullName: values.fullName.trim(), email: values.email.trim(), phone: values.phone.trim() }).unwrap();
+        toast.success(response.message || "Registered successfully");
         action.resetForm();
         navigate("/login");
-      } else {
-        toast.error("Registration failed");
+      } catch (error) {
+        toast.error(error?.data?.message || "Registration failed. Please try again.");
       }
     },
   });

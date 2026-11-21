@@ -12,7 +12,6 @@ const MainLayout = ({ colorScheme, toggleColorScheme }) => {
   return (
     <>
       <Navbar colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} />
-
       <Outlet />
 
       <Footer />

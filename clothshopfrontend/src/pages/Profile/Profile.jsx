@@ -27,7 +27,6 @@ import {
   useUpdateProfileMutation,
 } from "../../redux/auth/authApi";
 import DeleteAccountModal from "../../components/common/DeleteAccountModal";
-import useAccountActions from "../../hooks/useAccountActions";
 
 const ProfileContent = ({ user }) => {
   const [params, setParams] = useSearchParams();
@@ -44,7 +43,8 @@ const ProfileContent = ({ user }) => {
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [error, setError] = useState("");
-  const { signOut, signingOut } = useAccountActions();
+  const signOut = () => window.location.assign("/login");
+  const signingOut = false;
   const form = useFormik({
     initialValues: {
       fullName: user.fullName || "",

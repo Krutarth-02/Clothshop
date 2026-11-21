@@ -1,7 +1,6 @@
 ﻿const User = require("../models/User");
 const { sendEmail } = require("../services/emailService");
 const bcrypt = require("bcryptjs");
-const validate = require("../utils/validation");
 const { randomInt, randomBytes, createHash, createHmac } = require("node:crypto");
 const {
   ForbiddenError,
@@ -28,7 +27,9 @@ const getUserProfile = async (req, res, next) => {
 
 const forgotPassword = async (req, res, next) => {
   try {
-    const email = validate.text(req.body?.email, "email", 254).toLowerCase();
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return next(new BadRequestError("Enter a valid email address."));
     const user = await User.findOne({ email }).collation({ locale: "en", strength: 2 });
     if (user) {
       const otp = String(randomInt(100000, 1000000));
@@ -47,8 +48,10 @@ const forgotPassword = async (req, res, next) => {
 const resetCookieOptions = () => ({ httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", path: "/api/user" });
 const verifyOtp = async (req, res, next) => {
   try {
-    const { email, otp } = req.body;
-    const normalized = validate.text(email, "email", 254).toLowerCase();
+    const { email, otp } = req.body || {};
+    const normalized = typeof email === "string" ? email.trim().toLowerCase() : "";
+    if (normalized.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized))
+      return next(new BadRequestError("Enter a valid email address."));
     if (!["string", "number"].includes(typeof otp) || !/^\d{6}$/.test(String(otp))) return next(new BadRequestError("Enter the six-digit code."));
     const proof = randomBytes(32).toString("hex");
     const user = await User.findOneAndUpdate({ email: normalized,
@@ -67,15 +70,16 @@ const verifyOtp = async (req, res, next) => {
 };
 const resetPassword = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
-      return next(new BadRequestError("All fields required"));
-    }
+    if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72)
+      return next(new BadRequestError("Use at least 8 characters and at most 72 bytes for your password."));
 
     const proof = req.cookies?.passwordReset;
     if (typeof proof !== "string" || !/^[a-f0-9]{64}$/.test(proof)) return next(new ForbiddenError("Verify the reset code in this browser first."));
-    const normalized = validate.text(email, "email", 254).toLowerCase();
+    const normalized = typeof email === "string" ? email.trim().toLowerCase() : "";
+    if (normalized.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized))
+      return next(new BadRequestError("Enter a valid email address."));
     const user = await User.findOneAndUpdate({ email: normalized, isOtpVerified: true, resetTokenHash: createHash("sha256").update(proof).digest("hex"), resetTokenExpiry: { $gt: new Date() } }, {
       $set: { password: await bcrypt.hash(password, 12), isOtpVerified: false }, $unset: { otp: "", otpExpiry: "", resetTokenHash: "", resetTokenExpiry: "" }, $inc: { sessionVersion: 1 },
     });
@@ -104,7 +108,7 @@ const updateProfile = async (req, res, next) => {
       "phone",
       "rememberMe",
     ]) {
-      if (Object.prototype.hasOwnProperty.call(req.body, field))
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, field))
         updateData[field] = req.body[field];
     }
 
@@ -121,14 +125,17 @@ const updateProfile = async (req, res, next) => {
     if (updateData.fullName !== undefined && !updateData.fullName)
       return next(new BadRequestError("Full name is required."));
     if (updateData.email !== undefined) {
-      updateData.email = validate.text(updateData.email, "email", 254).toLowerCase();
+      updateData.email = typeof updateData.email === "string" ? updateData.email.trim().toLowerCase() : "";
+      if (updateData.email.length > 254) return next(new BadRequestError("Enter a valid email."));
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) return next(new BadRequestError("Enter a valid email."));
       const duplicate = await User.findOne({ email: updateData.email, _id: { $ne: user._id } })
         .collation({ locale: "en", strength: 2 }).select("_id").lean();
       if (duplicate) return next(new ConflictError("This email already has an account."));
     }
 
-    if (req.body.password) {
+    if (updateData.rememberMe !== undefined && typeof updateData.rememberMe !== "boolean")
+      return next(new BadRequestError("Remember me must be true or false."));
+    if (req.body?.password) {
       const isMatch = await bcrypt.compare(req.body.password, user.password);
       if (!isMatch) {
         return next(new ForbiddenError("Invalid password"));

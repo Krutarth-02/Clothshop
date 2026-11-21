@@ -1,3 +1,4 @@
+import { getSessionUserId } from "../../redux/api/baseQueryWithAuth";
 import ActionMenu, { ActionMenuItems } from "../common/ActionMenu";
 import CommonDrawer from "../common/CommonDrawer";
 import UserAvatar from "../common/UserAvatar";
@@ -5,8 +6,6 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../../redux/auth/authApi";
 import { notificationApi } from "../../redux/notifications/notificationApi";
-import { selectCartCount } from "../../redux/cart/cartSlice";
-import { selectWishlistCount } from "../../redux/wishlist/wishlistSlice";
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -39,7 +38,6 @@ import BrandLogo from "../common/BrandLogo";
 import NotificationDrawer from "./NotificationDrawer";
 import ProductSearch from "./ProductSearch";
 import DeleteAccountModal from "../common/DeleteAccountModal";
-import useAccountActions from "../../hooks/useAccountActions";
 
 const shopLinks = [
   {
@@ -97,9 +95,9 @@ const accountLinks = [
 const selectNotifications = notificationApi.endpoints.getNotifications.select();
 
 const Navbar = ({ colorScheme, toggleColorScheme }) => {
-  const cartCount = useSelector(selectCartCount);
-  const wishlistCount = useSelector(selectWishlistCount);
-  const signedIn = Boolean(localStorage.getItem("userId"));
+  const cartCount = 0;
+  const wishlistCount = 0;
+  const signedIn = Boolean(getSessionUserId());
   const {
     data: profile,
     isLoading: checkingAccount,
@@ -107,7 +105,8 @@ const Navbar = ({ colorScheme, toggleColorScheme }) => {
     refetch: retryProfile,
   } = useGetProfileQuery(undefined, { skip: !signedIn });
   const user = signedIn && !profileError ? profile?.data : null;
-  const { signOut, signingOut } = useAccountActions();
+  const signOut = () => window.location.assign("/login");
+  const signingOut = false;
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);

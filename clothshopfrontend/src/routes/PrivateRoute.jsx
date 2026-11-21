@@ -1,3 +1,4 @@
+import { getSessionUserId } from "../redux/api/baseQueryWithAuth";
 import { Navigate, Outlet } from "react-router-dom";
 import { Center } from "@mantine/core";
 import LoadingState from "../components/common/Loader";
@@ -5,7 +6,7 @@ import ErrorAlert from "../components/common/ErrorAlert";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
 const PrivateRoute = () => {
-  const signedIn = Boolean(localStorage.getItem("userId"));
+  const signedIn = Boolean(getSessionUserId());
   const { data, isLoading, isFetching, error, refetch } = useGetProfileQuery(
     undefined,
     {

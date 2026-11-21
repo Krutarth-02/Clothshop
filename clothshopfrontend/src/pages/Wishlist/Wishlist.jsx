@@ -12,6 +12,8 @@ import ErrorAlert from "../../components/common/ErrorAlert";
 const Wishlist = () => {
   const dispatch = useDispatch();
   const items = useSelector(selectWishlistItems);
+  const accountSaved = useSelector((state) => Boolean(state.wishlist.ownerId));
+  const saving = useSelector((state) => state.wishlist.saving);
   const [preview, setPreview] = useState(null);
   const { data, isLoading, isFetching, error, refetch } = useGetProductsQuery(undefined, { skip: !items.length, refetchOnMountOrArgChange: true });
   const products = Array.isArray(data?.data) ? data.data : [];
@@ -19,8 +21,8 @@ const Wishlist = () => {
   return <Container component="main" py={{ base: 28, md: 48 }} mih="65vh" style={{ overflowWrap: "anywhere" }}>
     <Breadcrumbs><Anchor component={Link} to="/" size="sm" c="dimmed">Home</Anchor><Text size="sm">Wishlist</Text></Breadcrumbs>
     <Group justify="space-between" align="flex-start" mb={32}>
-      <Text size="sm" c="dimmed">{items.length} saved {items.length === 1 ? "product" : "products"}. Kept on this browser for your next visit.</Text>
-      {items.length > 0 && <Button variant="subtle" color="gray" leftSection={<Trash2 size={16} />} onClick={() => dispatch(clearWishlist())}>Clear wishlist</Button>}
+      <Text size="sm" c="dimmed">{items.length} saved {items.length === 1 ? "product" : "products"}. {accountSaved ? "Saved to your account." : "Sign in to load your wishlist."}</Text>
+      {items.length > 0 && <Button variant="subtle" color="gray" loading={saving} leftSection={<Trash2 size={16} />} onClick={() => dispatch(clearWishlist())}>Clear wishlist</Button>}
     </Group>
     {!items.length ? <Paper withBorder radius="md" p={{ base: 28, md: 56 }}><Stack align="center" ta="center" gap="lg">
       <ThemeIcon size={68} radius="xl" variant="light" color="red"><Heart size={30} strokeWidth={1.5} /></ThemeIcon>

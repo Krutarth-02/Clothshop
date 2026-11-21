@@ -1,8 +1,7 @@
+import { getSessionUserId } from "../../redux/api/baseQueryWithAuth";
 import ErrorAlert from "../common/ErrorAlert";
-import ActionMenu from "../common/ActionMenu";
 import { useState } from "react";
 import {
-  ActionIcon,
   Anchor,
   Box,
   Button,
@@ -16,19 +15,13 @@ import {
 } from "@mantine/core";
 import {
   Bell,
-  Check,
   Gift,
-  MoreHorizontal,
   ShoppingBag,
-  X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
 import CommonDrawer from "../common/CommonDrawer";
 import {
   useGetNotificationsQuery,
-  useMarkNotificationReadMutation,
-  useDismissNotificationMutation,
 } from "../../redux/notifications/notificationApi";
 
 const relativeTime = (value) => {
@@ -46,30 +39,17 @@ const relativeTime = (value) => {
 const NotificationDrawer = ({ open, handleClose }) => {
   const colorScheme = useComputedColorScheme("light");
   const [activeTab, setActiveTab] = useState("all");
-  const signedIn = Boolean(localStorage.getItem("userId"));
+  const signedIn = Boolean(getSessionUserId());
   const { data, isLoading, isFetching, error, refetch } =
     useGetNotificationsQuery(undefined, {
       skip: !open || !signedIn,
       refetchOnMountOrArgChange: true,
     });
-  const [markRead, { isLoading: marking }] = useMarkNotificationReadMutation();
-  const [dismiss, { isLoading: dismissing }] = useDismissNotificationMutation();
   const notifications = data?.data || [];
   const filteredNotifications = notifications.filter((notification) =>
     activeTab === "all" ||
     (activeTab === "read" ? Boolean(notification.readAt) : !notification.readAt),
   );
-  const busy = marking || dismissing;
-  const run = async (mutation, id) => {
-    try {
-      await mutation(id).unwrap();
-    } catch (failure) {
-      toast.error(
-        failure?.data?.message ||
-          "Unable to update notifications. Please retry.",
-      );
-    }
-  };
 
   return (
     <CommonDrawer
@@ -196,22 +176,6 @@ const NotificationDrawer = ({ open, handleClose }) => {
                       </Anchor>
                     )}
                   </Box>
-                  <ActionMenu width={165} disabled={busy}
-                    items={[
-                      { label: "Mark as read", icon: <Check size={15} />, disabled: !unread,
-                        action: () => run(markRead, notification._id), style: { minHeight: 36 } },
-                      { label: "Cancel", icon: <X size={15} />, danger: true,
-                        action: () => run(dismiss, notification._id), style: { minHeight: 36 } },
-                    ]}
-                    target={<ActionIcon
-                        variant="subtle"
-                        color="gray"
-                        size="sm"
-                        aria-label={`Options for ${notification.title}`}
-                        disabled={busy}
-                      >
-                        <MoreHorizontal size={19} />
-                      </ActionIcon>} />
                 </Box>
               );
             })}

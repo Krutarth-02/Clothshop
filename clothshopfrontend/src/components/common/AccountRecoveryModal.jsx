@@ -17,7 +17,6 @@ import {
 const AccountRecoveryModal = ({ email, onClose, onRecovered }) => {
   const [step, setStep] = useState("email");
   const [otp, setOtp] = useState("");
-  const [resetToken, setResetToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -45,8 +44,7 @@ const AccountRecoveryModal = ({ email, onClose, onRecovered }) => {
     }
     try {
       if (step === "otp") {
-        const result = await verifyOtp({ email, otp }).unwrap();
-        setResetToken(result.resetToken);
+        await verifyOtp({ email, otp }).unwrap();
         setStep("password");
       } else {
         if (password !== confirmPassword) {
@@ -60,7 +58,7 @@ const AccountRecoveryModal = ({ email, onClose, onRecovered }) => {
           setError("Use at least 8 characters and at most 72 bytes.");
           return;
         }
-        await resetPassword({ email, password, resetToken }).unwrap();
+        await resetPassword({ email, password }).unwrap();
         onRecovered(password);
       }
     } catch (failure) {

@@ -19,16 +19,16 @@ const ForgotPassword = () => {
 
   const handleSubmit = async () => {
     try {
-      const res = await forgotpassword({ email }).unwrap();
+      const res = await forgotpassword({ email: email.trim() }).unwrap();
       if (res.message) {
-        toast.success("Reset link sent to your email");
-        navigate("/verify-otp", { state: { email } });
+        toast.success(res.message);
+        navigate("/verify-otp", { state: { email: email.trim() } });
         setEmail("");
       } else {
         toast.error("Failed to send reset link");
       }
-    } catch {
-      toast.error("Failed to send reset link");
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to send verification code");
     }
   };
 

@@ -1,7 +1,7 @@
 import { api } from "../api/api";
 import { handleGetProductById } from "./product.dispacher";
 
-export const productApi = api.injectEndpoints({
+export const productApi = api.enhanceEndpoints({ addTagTypes: ["Wishlist", "Cart"] }).injectEndpoints({
   endpoints: (builder) => ({
     searchProducts: builder.infiniteQuery({
       providesTags: ["Products"],

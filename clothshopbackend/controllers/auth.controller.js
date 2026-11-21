@@ -2,7 +2,6 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { recordSuccessfulLogin } = require("../services/loginActivity");
 const {
   BadRequestError,
   ServiceUnavailableError,
@@ -285,7 +284,18 @@ const LoginUser = async (req, res, next) => {
       expiresIn: rememberMe ? "15d" : "7d",
     });
 
-    user = await recordSuccessfulLogin(user, rememberMe);
+    const now = new Date();
+    const loginUpdates = { rememberMe: rememberMe === true, lastLoginAt: now };
+    const firstLogin = await User.findOneAndUpdate(
+      { _id: user._id, firstLoginAt: null },
+      { $set: { ...loginUpdates, firstLoginAt: now } },
+      { returnDocument: "after", runValidators: true },
+    );
+    user = firstLogin || await User.findByIdAndUpdate(
+      user._id,
+      { $set: loginUpdates },
+      { returnDocument: "after", runValidators: true },
+    );
     if (!user) return next(new UnauthorizedError("Account no longer exists"));
 
     // Store token in cookie
@@ -318,19 +328,24 @@ const LoginUser = async (req, res, next) => {
 
 const SignupUser = async (req, res, next) => {
   try {
-    const { fullName, email, password } = req.body || {};
-    if (typeof fullName !== "string" || !fullName.trim() || fullName.length > 200 ||
+    const body = req.body || {};
+    const fullName = body.fullName?.trim();
+    const email = body.email?.trim().toLowerCase();
+    const password = body.password;
+    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    if (typeof fullName !== "string" || !fullName || fullName.length > 200 ||
       typeof email !== "string" || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72)
-      return next(new BadRequestError("Enter a name, valid email and password of 8 to 72 bytes."));
-    const user = await User.findOne({ email: email.trim() }).collation({ locale: "en", strength: 2 });
+      typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72 || phone.length > 100)
+      return next(new BadRequestError("Enter a name, valid email, phone and password of 8 to 72 bytes."));
+    const user = await User.findOne({ email }).collation({ locale: "en", strength: 2 });
     if (user) {
       return next(new ForbiddenError("User already exists"));
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       fullName,
-      email: email.trim().toLowerCase(),
+      email,
+      phone,
       password: hashedPassword,
       role: "user",
     });

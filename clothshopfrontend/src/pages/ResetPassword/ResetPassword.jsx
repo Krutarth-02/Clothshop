@@ -18,7 +18,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
-  const resetToken = location.state?.resetToken;
+  const verified = location.state?.verified === true;
 
   const [resetpassword, { isLoading }] = useResetPasswordMutation();
 
@@ -32,7 +32,6 @@ const ResetPassword = () => {
       const res = await resetpassword({
         email,
         password,
-        resetToken,
       }).unwrap();
 
       toast.success(res.message);
@@ -45,7 +44,7 @@ const ResetPassword = () => {
     }
   };
 
-  if (!email || !resetToken) {
+  if (!email || !verified) {
     return (
       <RecoveryPrompt
         title="Recover your account."

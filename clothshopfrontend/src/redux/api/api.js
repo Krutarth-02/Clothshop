@@ -9,9 +9,6 @@ export const api = createApi({
 });
 
 export const getCacheSession = (getState) => {
-  for (const endpoint of ["getProfile"]) {
-    const user = api.endpoints[endpoint]?.select()(getState())?.data?.data;
-    if (user) return String(user._id);
-  }
-  return "";
+  const profile = api.endpoints.getProfile?.select()(getState());
+  return profile?.isError ? "" : String(profile?.data?.data?._id || "");
 };

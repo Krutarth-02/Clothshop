@@ -7,12 +7,10 @@ const getNotifications = async (req, res, next) => {
     })
       .sort({ createdAt: -1, _id: -1 })
       .lean();
-    res.json({ data });
+    return res.json({ data });
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = {
-  getNotifications,
-};
+module.exports = { getNotifications };

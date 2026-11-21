@@ -1,3 +1,15 @@
+const priceFormatters = new Map();
+export function formatPrice(value, options = {}) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return options.fallback || "—";
+  const { fallback: _fallback, ...settings } = options;
+  const format = { style: "currency", currency: "INR", maximumFractionDigits: 2, ...settings };
+  const key = JSON.stringify(format);
+  try {
+    if (!priceFormatters.has(key)) priceFormatters.set(key, new Intl.NumberFormat("en-IN", format));
+    return priceFormatters.get(key).format(value);
+  } catch { return options.fallback || "—"; }
+}
+
 export const productOptions = (value) => {
   if (typeof value === "string") {
     try {

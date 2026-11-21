@@ -1,9 +1,10 @@
+import { getSessionUserId } from "../redux/api/baseQueryWithAuth";
 import { Navigate, Outlet } from "react-router-dom";
 import LoadingState from "../components/common/Loader";
 import { useGetProfileQuery } from "../redux/auth/authApi";
 
 const PublicRoute = () => {
-  const signedIn = Boolean(localStorage.getItem("userId"));
+  const signedIn = Boolean(getSessionUserId());
   const { data, isLoading } = useGetProfileQuery(undefined, {
     skip: !signedIn,
   });
